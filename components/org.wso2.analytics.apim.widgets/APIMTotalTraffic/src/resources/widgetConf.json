@@ -1,0 +1,10 @@
+{
+  "name" : "APITrafficWidget",
+  "id" : "APITrafficWidget",
+  "thumbnailURL" : "",
+  "configs" : {
+    "pubsub" : {
+      "types" : ["subscriber"]
+    }
+  }
+}

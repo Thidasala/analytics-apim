@@ -28,6 +28,11 @@
 
     <dependencies>
         <!-- Widgets-->
+         <dependency>
+            <groupId>org.wso2.analytics.apim</groupId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.total.traffic</artifactId>
+            <type>zip</type>
+        </dependency>
         <dependency>
             <groupId>org.wso2.analytics.apim</groupId>
             <artifactId>org.wso2.analytics.apim.widgets.apim.apisubscriber.alert.config</artifactId>
@@ -223,6 +228,15 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wso2.analytics.apim</groupId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.total.traffic</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>APIMTotalTraffic/**</includes>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wso2.analytics.apim</groupId>
                                     <artifactId>org.wso2.analytics.apim.widgets.apim.apisubscriber.alert.config</artifactId>

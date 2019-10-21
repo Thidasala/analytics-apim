@@ -291,11 +291,11 @@ wso2.datasources:
     definition:
       type: RDBMS
       configuration:
-        jdbcUrl: 'jdbc:h2:${sys:carbon.home}/wso2/worker/database/WSO2AM_STATS_DB;AUTO_SERVER=TRUE'
-        username: wso2carbon
-        password: wso2carbon
-        driverClassName: org.h2.Driver
-        maxPoolSize: 50
+        jdbcUrl: 'jdbc:mysql://localhost:3306/ANALYTICS_NEW?useSSL=false'
+        username: "root"
+        password: "" 
+        driverClassName: com.mysql.jdbc.Driver
+        maxPoolSize: 10
         idleTimeout: 60000
         connectionTestQuery: SELECT 1
         validationTimeout: 30000
@@ -309,10 +309,10 @@ wso2.datasources:
     definition:
       type: RDBMS
       configuration:
-        jdbcUrl: "jdbc:h2:${sys:carbon.home}/../wso2am-3.0.0/repository/database/WSO2AM_DB;AUTO_SERVER=TRUE"
-        username: wso2carbon
-        password: wso2carbon
-        driverClassName: org.h2.Driver
+        jdbcUrl: 'jdbc:mysql://localhost:3306/WSO2AM_DB_NEW?useSSL=false'
+        username: "root"
+        password: ""
+        driverClassName: com.mysql.jdbc.Driver
         maxPoolSize: 10
         idleTimeout: 60000
         connectionTestQuery: SELECT 1
