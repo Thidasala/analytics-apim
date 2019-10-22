@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
- 
+
 class APITrafficWidget extends Component {
     render() {
         return (
@@ -7,5 +7,5 @@ class APITrafficWidget extends Component {
         );
     }
 }
- 
-global.dashboard.registerWidget('APITrafficWidget', APITrafficWidget);
+
+global.dashboard.registerWidget('APIMTotalTraffic', APITrafficWidget);
