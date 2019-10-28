@@ -14,5 +14,5 @@
   "table.heading.apiname": "API NAME",
   "table.heading.hits": "HITS ",
   "table.main.heading": "OVERALL API USAGE (ALL VERSIONS) :",
-  "widget.heading": "OVERALL API USAGE"
+  "widget.heading": "Recent API Traffic"
 }
