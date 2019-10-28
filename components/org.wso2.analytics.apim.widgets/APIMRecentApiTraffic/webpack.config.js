@@ -23,11 +23,11 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     context: path.resolve(__dirname, './src'),
     entry: {
-        index: './APITrafficWidget.jsx',
+        index: './APIMRecentApiTrafficWidget.jsx',
     },
     output: {
-        path: path.resolve(__dirname, './dist/APITrafficWidget'),
-        filename: 'APITrafficWidget.js',
+        path: path.resolve(__dirname, './dist/APIMRecentApiTraffic'),
+        filename: 'APIMRecentApiTraffic.js',
     },
     module: {
         loaders: [

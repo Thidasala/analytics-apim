@@ -181,7 +181,7 @@ class APIMTopAgentsWidget extends Widget {
     }
 
     /**
-     * Retrieve params from publisher - DateTimeRange
+     * Retrieve params from publisher - DateTimeRange 
      * @memberof APIMTopAgentsWidget
      * */
     handlePublisherParameters(receivedMsg) {

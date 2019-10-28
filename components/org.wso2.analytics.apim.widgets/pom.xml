@@ -64,7 +64,8 @@
         <module>APIMApiLatencyTime</module>
         <module>APIMGeoBasedInvocations</module>
         <module>DateTimeRangePicker</module>
-        <module>APIMTotalTraffic</module>
+        <module>APIMRecentApiTraffic</module>
     </modules>
 
 </project>
+   

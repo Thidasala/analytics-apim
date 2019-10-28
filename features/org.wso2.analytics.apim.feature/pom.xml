@@ -30,7 +30,7 @@
         <!-- Widgets-->
          <dependency>
             <groupId>org.wso2.analytics.apim</groupId>
-            <artifactId>org.wso2.analytics.apim.widgets.apim.total.traffic</artifactId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.traffic</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
@@ -230,12 +230,12 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.wso2.analytics.apim</groupId>
-                                    <artifactId>org.wso2.analytics.apim.widgets.apim.total.traffic</artifactId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.traffic</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
-                                    <includes>APIMTotalTraffic/**</includes>
+                                    <includes>APIMRecentApiTraffic/**</includes>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wso2.analytics.apim</groupId>

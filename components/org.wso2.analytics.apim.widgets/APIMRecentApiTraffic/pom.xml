@@ -25,9 +25,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>org.wso2.analytics.apim.widgets.apim.total.traffic</artifactId>
+    <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.traffic</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Analytics Solutions - Widgets - APIM Analytics - Top Application Users</name>
+    <name>WSO2 Analytics Solutions - Widgets - APIM Analytics - Recent Api Traffic </name>
     <url>http://wso2.org</url>
 
     <build>
