@@ -129,7 +129,7 @@ export default function APIMApiTest(props) {
                 </h3>
                 <p style={styles.weekCount}>
                     [
-                    {' '} {weekCount} {' '} {weekCount === '01' ? 'API' : 'APIS'} {' '}
+                    {' '} {weekCount} {' '} {weekCount === '01' ? 'APII' : 'APIS'} {' '}
                     <FormattedMessage id='within.week.text' defaultMessage='WITHIN LAST WEEK ' />
                     ]
                 </p>
