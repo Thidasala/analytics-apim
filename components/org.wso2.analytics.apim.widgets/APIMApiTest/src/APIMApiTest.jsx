@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-indent-props */
+/* eslint-disable comma-dangle */
 /* eslint-disable indent */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable spaced-comment */
@@ -26,36 +28,47 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import ApiIcon from './ApiIcon';
-
+import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the APIM Api Created Count widget body
  */
 export default function APIMApiTest(props) {
+
+    const chartTheme = {
+        axis: {
+          style: {
+            tickLabels: {
+              // this changed the color of my numbers to white
+              fill: 'white',
+              fontSize: '9px',
+              angle: 25
+            },
+          },
+        },
+      };
+
+    const dataset = [
+        { API: 'API1', Traffic: 100 },
+        { API: 'API2', Traffic: 75 },
+        { API: 'API3', Traffic: 40 },
+        { API: 'API4', Traffic: 55 }
+    ];
+
     const { themeName, totalCount, weekCount } = props;
     const styles = {
         headingWrapper: {
-            height: '10%',
+            height: '5%',
             margin: 'auto',
             paddingTop: '10px',
             width: '90%',
         },
-        iconWrapper: {
-            float: 'left',
-            width: '40%',
-            height: '62%',
-        },
-        icon: {
-            display: 'block',
-            margin: 'auto',
-            marginTop: '25%',
-        },
         dataWrapper: {
-            float: 'left',
-            width: '60%',
-            height: '50%',
-            paddingTop: '8%',
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            paddingTop: '0%',
         },
         weekCount: {
             margin: 0,
@@ -85,7 +98,7 @@ export default function APIMApiTest(props) {
                 background: themeName === 'dark'
                     ? 'linear-gradient(to right, rgb(4, 31, 51) 0%, rgb(37, 113, 167) 46%, rgb(42, 71, 101) 100%'
                     : '#fff',
-                width: '90%',
+                width: '95%',
                 height: '85%',
                 margin: '5% 5%',
             }}
@@ -93,73 +106,52 @@ export default function APIMApiTest(props) {
             <div style={styles.headingWrapper}>
                 <h3
                     style={{
-                        borderBottom: themeName === 'dark' ? '1.5px solid #fff' : '2px solid #2571a7',
-                        paddingBottom: '10px',
+                        borderBottom: themeName === 'dark' ? '1.5px solid #fff' : '3px solid #2571a7',
+                        paddingBottom: '20px',
                         margin: 'auto',
-                        textAlign: 'right',
+                        textAlign: 'center',
                         fontWeight: 'normal',
                         letterSpacing: 1.5,
                     }}
                 >
-                    <FormattedMessage id='widget.heading' defaultMessage='TOTAL APPI COUNT' />
+                    <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
+                </h3>
+                <h3
+                style={{
+                    fontWeight: 'normal',
+                    paddingBottom: '20px'
+                }}>
+                   Total Traffic: 225 TPS
                 </h3>
             </div>
-            <div style={styles.iconWrapper}>
-                <ApiIcon
-                    strokeColor={themeName === 'dark' ? '#fff' : '#2571a7'}
-                    width='50%'
-                    height='50%'
-                    style={styles.icon}
-                />
-            </div>
+
             <div style={styles.dataWrapper}>
-                <h1
-                    style={{
-                        margin: 'auto',
-                        textAlign: 'center',
-                        fontSize: '300%',
-                        display: 'inline',
-                        color: themeName === 'dark' ? '#fff' : '#2571a7',
-                    }}
-                >
-                    {totalCount}
-                </h1>
-                <h3 style={styles.typeText}>
-                    {totalCount === '01' ? 'API' : 'APIS'}
-                </h3>
-                <p style={styles.weekCount}>
-                    [
-                    {' '} {weekCount} {' '} {weekCount === '01' ? 'APII' : 'APIS'} {' '}
-                    <FormattedMessage id='within.week.text' defaultMessage='WITHIN LAST WEEK ' />
-                    ]
-                </p>
+                    <VictoryChart theme={chartTheme} domainPadding={{x: 40}}>
+                        <VictoryBar
+                        style={{ display: "flex", flexWrap: "wrap", data: {fill: "#b3b9c4"} }}
+                        animate={{
+                            duration: 2000,
+                            onLoad: { duration: 1000 }
+                            }}
+                        data={dataset}
+                        x="API"
+                        y="Traffic"
+                        />
+                        <VictoryAxis
+                        label="API Name"
+                        style={{
+                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
+                        }}
+                        />
+                        <VictoryAxis dependentAxis
+                        label="Total Traffic"
+                        style={{
+                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
+                        }}
+                        />
+                    </VictoryChart>
+
             </div>
-            {/*todo make route path configurable from widgetconf*/}
-            {/*<button*/}
-                {/*type='button'*/}
-                {/*style={{*/}
-                    {/*display: 'block',*/}
-                    {/*width: '100%',*/}
-                    {/*height: '21%',*/}
-                    {/*background: themeName === 'dark'*/}
-                        {/*? 'linear-gradient(to right, rgba(37, 38, 41, 0.75) 0%, rgba(252, 252, 252, 0) 100%)'*/}
-                        {/*: '#fff',*/}
-                    {/*border: 'none',*/}
-                    {/*borderTop: themeName === 'dark' ? 'none' : '1.5px solid #000',*/}
-                    {/*color: themeName === 'dark' ? '#fff' : '#000',*/}
-                    {/*textAlign: 'left',*/}
-                    {/*padding: '0 5%',*/}
-                    {/*fontSize: '90%',*/}
-                    {/*letterSpacing: 1,*/}
-                    {/*cursor: 'pointer',*/}
-                {/*}}*/}
-                {/*onClick={() => {*/}
-                    {/*window.location.href = './api-app-stats';*/}
-                {/*}}*/}
-            {/*>*/}
-                {/*<FormattedMessage id='overtime.btn.text' defaultMessage='Overtime Analysis' />*/}
-                {/*<PlayCircleFilled style={styles.playIcon} />*/}
-            {/*</button>*/}
         </div>
     );
 }

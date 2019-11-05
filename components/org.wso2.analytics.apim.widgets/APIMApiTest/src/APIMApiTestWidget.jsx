@@ -52,28 +52,14 @@ const lightTheme = createMuiTheme({
     },
 });
 
-/**
- * Language
- * @type {string}
- */
+
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
-/**
- * Language without region code
- */
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
-/**
- * Create React Component for APIM Api Created
- * @class APIMApiTestWidget
- * @extends {Widget}
- */
+
 class APIMApiTestWidget extends Widget {
-    /**
-     * Creates an instance of APIMApiTestWidget.
-     * @param {any} props @inheritDoc
-     * @memberof APIMApiTestWidget
-     */
+
     constructor(props) {
         super(props);
 

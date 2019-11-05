@@ -10,13 +10,13 @@
       "configs" : {
         "type" : "RDBMSStreamingDataProvider",
         "config" : {
-          "datasourceName": "AM_DB",
+          "datasourceName": "APIM_ANALYTICS_DB",
           "queryData" : {
-            "totalQuery": "select COUNT(API_ID) as count from AM_API where CONTEXT {{contextCondition}} group by API_ID",
-            "weekQuery" : "select COUNT(API_ID) as count from AM_API where CONTEXT {{contextCondition}} and CREATED_TIME between '{{weekStart}}' and '{{weekEnd}}' group by API_ID"
+            "totalQuery": "select COUNT(AGG_COUNT) as count from ApiUserPerAppAgg_MINUTES group by apiName",
+            "weekQuery" : "select COUNT(AGG_COUNT) as count from ApiUserPerAppAgg_MINUTES where AGG_EVENT_TIMESTAMP between '{{weekStart}}' and '{{weekEnd}}' group by apiName"
           },
-          "tableName": "AM_API",
-          "incrementalColumn": "API_ID",
+          "tableName": "ApiUserPerAppAgg_MINUTES",
+          "incrementalColumn": "AGG_COUNT",
           "publishingLimit": 2147483647,
           "purgingInterval": 6,
           "purgingLimit": 6,
