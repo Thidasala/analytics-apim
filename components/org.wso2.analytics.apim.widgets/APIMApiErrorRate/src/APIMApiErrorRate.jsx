@@ -27,33 +27,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
-import ApiIcon from './ApiIcon';
-import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
+import { VictoryPie, VictoryLabel } from 'victory';
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the APIM Api Created Count widget body
  */
-export default function APIMApiTest(props) {
+export default function APIMApiErrorRate(props) {
 
-    const chartTheme = {
-        axis: {
-          style: {
-            tickLabels: {
-              // this changed the color of my numbers to white
-              fill: 'white',
-              fontSize: '9px',
-              angle: 25
-            },
-          },
-        },
-      };
 
     const dataset = [
-        { API: 'API1', Traffic: 100 },
-        { API: 'API2', Traffic: 75 },
-        { API: 'API3', Traffic: 40 },
-        { API: 'API4', Traffic: 55 }
+        { x: 'API1 (20%)', y: 100 },
+        { x: 'API2 (15%)', y: 75 },
+        { x: 'API3 (10%)', y: 40 },
+        { x: 'API4 (8%)', y: 55 }
     ];
 
     const { themeName, totalCount, weekCount } = props;
@@ -68,7 +55,7 @@ export default function APIMApiTest(props) {
             textAlign: 'center',
             width: '100%',
             height: '100%',
-            paddingTop: '0%',
+            paddingTop: '5%',
         },
         weekCount: {
             margin: 0,
@@ -119,44 +106,36 @@ export default function APIMApiTest(props) {
                 <h3
                 style={{
                     fontWeight: 'normal',
-                    paddingBottom: '20px'
-                }}>
-                   Total Traffic: 225 TPS
+                    paddingBottom: '30px'
+                }}
+                >
+                   Total Error Rate: 57.4 %
                 </h3>
             </div>
 
             <div style={styles.dataWrapper}>
-                    <VictoryChart theme={chartTheme} domainPadding={{x: 40}}>
-                        <VictoryBar
-                        style={{ display: "flex", flexWrap: "wrap", data: {fill: "#b3b9c4"} }}
-                        animate={{
-                            duration: 2000,
-                            onLoad: { duration: 1000 }
-                            }}
-                        data={dataset}
-                        x="API"
-                        y="Traffic"
-                        />
-                        <VictoryAxis
-                        label="API Name"
-                        style={{
-                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
-                        }}
-                        />
-                        <VictoryAxis dependentAxis
-                        label="Total Traffic"
-                        style={{
-                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
-                        }}
-                        />
-                    </VictoryChart>
-
+            <svg viewBox="-100 0 500 500">
+                <VictoryPie
+                standalone={false}
+                width={290} height={290}
+                data={dataset}
+                innerRadius={0} labelRadius={0}
+                colorScale="qualitative"
+                style={{ labels: { fontSize: 11, fill: "white" } }}
+                />
+                {/* <VictoryLabel
+                textAnchor="middle"
+                style={{ fontSize: 20 }}
+                x={150} y={200}
+                text="Errors: 57.4 %"
+                /> */}
+            </svg>
             </div>
         </div>
     );
 }
 
-APIMApiTest.propTypes = {
+APIMApiErrorRate.propTypes = {
     themeName: PropTypes.string.isRequired,
     totalCount: PropTypes.string.isRequired,
     weekCount: PropTypes.string.isRequired,

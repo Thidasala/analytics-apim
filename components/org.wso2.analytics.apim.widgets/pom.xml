@@ -65,6 +65,7 @@
         <module>APIMGeoBasedInvocations</module>
         <module>DateTimeRangePicker</module>
         <module>APIMRecentApiTraffic</module>
+        <module>APIMApiErrorRate</module>
     </modules>
 
 </project>

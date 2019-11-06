@@ -37,7 +37,7 @@ import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
 export default function APIMApiTest(props) {
 
     const chartTheme = {
-        axis: {
+         axis: {
           style: {
             tickLabels: {
               // this changed the color of my numbers to white

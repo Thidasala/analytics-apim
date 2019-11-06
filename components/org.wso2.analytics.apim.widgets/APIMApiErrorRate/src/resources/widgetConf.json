@@ -1,6 +1,6 @@
 {
-  "name" : "APIM Api Test",
-  "id" : "APIMApiTest",
+  "name" : "APIM Api Error Rate",
+  "id" : "APIMApiErrorRate",
   "thumbnailURL" : "",
   "configs" : {
     "pubsub" : {

@@ -23,11 +23,11 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     context: path.resolve(__dirname, './src'),
     entry: {
-        index: './APIMApiTestWidget.jsx',
+        index: './APIMApiErrorRateWidget.jsx',
     },
     output: {
-        path: path.resolve(__dirname, './dist/APIMApiTest'),
-        filename: 'APIMApiTest.js',
+        path: path.resolve(__dirname, './dist/APIMApiErrorRate'),
+        filename: 'APIMApiErrorRate.js',
     },
     module: {
         loaders: [

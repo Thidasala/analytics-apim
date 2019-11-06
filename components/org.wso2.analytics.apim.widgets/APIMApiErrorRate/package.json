@@ -1,5 +1,5 @@
 {
-    "name": "apim-api-test",
+    "name": "apim-api-error-rate",
     "version": "1.0.0",
     "private": true,
     "dependencies": {

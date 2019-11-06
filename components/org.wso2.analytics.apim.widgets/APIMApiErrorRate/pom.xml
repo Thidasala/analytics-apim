@@ -25,9 +25,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>org.wso2.analytics.apim.widgets.apim.apitest</artifactId>
+    <artifactId>org.wso2.analytics.apim.widgets.apim.api.error.rate</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Analytics Solutions - Widgets - APIM Analytics - Api Test </name>
+    <name>WSO2 Analytics Solutions - Widgets - APIM Analytics - Api Error Rate </name>
     <url>http://wso2.org</url>
 
     <build>
