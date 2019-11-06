@@ -33,14 +33,14 @@ import { VictoryPie, VictoryLabel } from 'victory';
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the APIM Api Created Count widget body
  */
-export default function APIMApiErrorRate(props) {
+export default function APIMApiAlerts(props) {
 
 
     const dataset = [
-        { x: 'API1 (20%)', y: 100 },
-        { x: 'API2 (15%)', y: 75 },
-        { x: 'API3 (10%)', y: 40 },
-        { x: 'API4 (8%)', y: 55 }
+        { x: 'API1 (10)', y: 10 },
+        { x: 'API2 (70)', y: 70 },
+        { x: 'API3 (50)', y: 50 },
+        { x: 'API4 (20)', y: 20 }
     ];
 
     const { themeName, totalCount, weekCount } = props;
@@ -97,11 +97,11 @@ export default function APIMApiErrorRate(props) {
                         paddingBottom: '20px',
                         margin: 'auto',
                         textAlign: 'center',
-                        fontWeight: 'normal',
+                        fontWeight: 'bold',
                         letterSpacing: 1.5,
                     }}
                 >
-                    <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
+                    <FormattedMessage id='widget.heading' defaultMessage='Recent Api Alerts' />
                 </h3>
                 <h3
                 style={{
@@ -109,7 +109,7 @@ export default function APIMApiErrorRate(props) {
                     paddingBottom: '30px'
                 }}
                 >
-                   Total Error Rate: 57.4 %
+                   Total Alrts : 108
                 </h3>
             </div>
 
@@ -123,19 +123,13 @@ export default function APIMApiErrorRate(props) {
                 colorScale="qualitative"
                 style={{ labels: { fontSize: 11, fill: "white" } }}
                 />
-                {/* <VictoryLabel
-                textAnchor="middle"
-                style={{ fontSize: 20 }}
-                x={150} y={200}
-                text="Errors: 57.4 %"
-                /> */}
             </svg>
             </div>
         </div>
     );
 }
 
-APIMApiErrorRate.propTypes = {
+APIMApiAlerts.propTypes = {
     themeName: PropTypes.string.isRequired,
     totalCount: PropTypes.string.isRequired,
     weekCount: PropTypes.string.isRequired,

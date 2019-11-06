@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable valid-jsdoc */
-/* eslint-disable require-jsdoc */
+
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -32,7 +32,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Widget from '@wso2-dashboards/widget';
-import APIMApiErrorRate from './APIMApiErrorRate';
+import APIMApiAlerts from './APIMApiAlerts';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -58,7 +58,7 @@ const language = (navigator.languages && navigator.languages[0]) || navigator.la
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
 
-class APIMApiErrorRateWidget extends Widget {
+class APIMApiAlertsWidget extends Widget {
 
     constructor(props) {
         super(props);
@@ -142,10 +142,10 @@ class APIMApiErrorRateWidget extends Widget {
 
     /**
      * Load locale file.
-     * @memberof APIMApiErrorRateWidget
+     * @memberof APIMApiAlertsWidget
      */
     loadLocale(locale) {
-        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiErrorRate/locales/${locale}.json`)
+        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiAlerts/locales/${locale}.json`)
             .then((response) => {
                 this.setState({ localeMessages: defineMessages(response.data) });
             })
@@ -154,7 +154,7 @@ class APIMApiErrorRateWidget extends Widget {
 
     /**
      * Formats the siddhi query
-     * @memberof APIMApiErrorRateWidget
+     * @memberof APIMApiAlertsWidget
      * */
     assembletotalQuery() {
         const { providerConfig } = this.state;
@@ -169,7 +169,7 @@ class APIMApiErrorRateWidget extends Widget {
     /**
      * Formats data received from assembletotalQuery
      * @param {object} message - data retrieved
-     * @memberof APIMApiErrorRateWidget
+     * @memberof APIMApiAlertsWidget
      * */
     handleTotalCountReceived(message) {
         const { data } = message;
@@ -184,7 +184,7 @@ class APIMApiErrorRateWidget extends Widget {
 
     /**
      * Formats the siddhi query using selected options
-     * @memberof APIMApiErrorRateWidget
+     * @memberof APIMApiAlertsWidget
      * */
     assembleweekQuery() {
         const { providerConfig } = this.state;
@@ -204,7 +204,7 @@ class APIMApiErrorRateWidget extends Widget {
     /**
      * Formats data received from assembleweekQuery
      * @param {object} message - data retrieved
-     * @memberof APIMApiErrorRateWidget
+     * @memberof APIMApiAlertsWidget
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
@@ -216,8 +216,8 @@ class APIMApiErrorRateWidget extends Widget {
 
     /**
      * @inheritDoc
-     * @returns {ReactElement} Render the APIM Api Created widget
-     * @memberof APIMApiErrorRateWidget
+     * @returns {ReactElement} Render the APIM Api Alerts widget
+     * @memberof APIMApiAlertsWidget
      */
     render() {
         const {
@@ -260,7 +260,7 @@ class APIMApiErrorRateWidget extends Widget {
                                 </Paper>
                             </div>
                         ) : (
-                            <APIMApiErrorRate {...apitestProps} />
+                            <APIMApiAlerts {...apitestProps} />
                         )
                     }
                 </MuiThemeProvider>
@@ -269,4 +269,4 @@ class APIMApiErrorRateWidget extends Widget {
     }
 }
 
-global.dashboard.registerWidget('APIMApiErrorRate', APIMApiErrorRateWidget);
+global.dashboard.registerWidget('APIMApiAlerts', APIMApiAlertsWidget);
