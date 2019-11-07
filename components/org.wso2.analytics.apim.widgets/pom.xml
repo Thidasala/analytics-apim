@@ -66,6 +66,8 @@
         <module>DateTimeRangePicker</module>
         <module>APIMRecentApiTraffic</module>
         <module>APIMApiErrorRate</module>
+        <module>APIMApiAlerts</module>
+        <module>APIMApiLatency</module>
     </modules>
 
 </project>

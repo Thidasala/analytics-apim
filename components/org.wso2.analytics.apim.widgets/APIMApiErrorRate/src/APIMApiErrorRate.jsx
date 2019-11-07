@@ -116,6 +116,10 @@ export default function APIMApiErrorRate(props) {
             <div style={styles.dataWrapper}>
             <svg viewBox="-100 0 500 500">
                 <VictoryPie
+                animate={{
+                    duration: 2000,
+                    onLoad: { duration: 1000 }
+                    }}
                 standalone={false}
                 width={290} height={290}
                 data={dataset}

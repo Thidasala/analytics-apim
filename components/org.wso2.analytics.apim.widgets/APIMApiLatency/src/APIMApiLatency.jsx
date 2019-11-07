@@ -27,14 +27,33 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
-import ApiIcon from './ApiIcon';
-import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
+import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme,VictoryGroup } from 'victory';
+import VizG from 'react-vizgrammar'
+
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the APIM Api Created Count widget body
  */
-export default function APIMApiTest(props) {
+export default function APIMApiLatency(props) {
+
+    //configuration for chart
+    let config = {
+        x : "rpm",
+        charts : [{type: "line", y : "torque", color: "EngineType"}],
+        maxLength: 10,
+        width: 400,
+        height: 200
+    }
+
+    metadata = {
+        "names" : ["rpm", "torque", "horsepower", "EngineType"],
+        "types" : ["linear", "linear", "ordinal", "ordinal"]
+    };
+
+    data = [
+        [8000, 75, 120, "Piston"], [9000, 81, 130, "Rotary"]
+    ];
 
     const chartTheme = {
          axis: {
@@ -44,17 +63,27 @@ export default function APIMApiTest(props) {
               fill: 'white',
               fontSize: '9px',
               angle: 25
-            },
+            },grid: { stroke: "none" }
           },
         },
       };
 
-    const dataset = [
-        { API: 'API1', Traffic: 100 },
-        { API: 'API2', Traffic: 75 },
-        { API: 'API3', Traffic: 40 },
-        { API: 'API4', Traffic: 55 }
-    ];
+    const dataset1 = [
+        { API: 'API1', MaxLatency: 1 },
+        { API: 'API2', MaxLatency: 2 },
+        { API: 'API3', MaxLatency: 3 },
+        { API: 'API4', MaxLatency: 2 },
+        { API: 'API5', MaxLatency: 1 }
+        ];
+
+    const dataset2 = [
+        { API: 'API1', TopLatency: 2 },
+        { API: 'API2', TopLatency: 3 },
+        { API: 'API3', TopLatency: 4 },
+        { API: 'API4', TopLatency: 5 },
+        { API: 'API5', TopLatency: 5 }
+        ]
+
 
     const { themeName, totalCount, weekCount } = props;
     const styles = {
@@ -114,49 +143,48 @@ export default function APIMApiTest(props) {
                         letterSpacing: 1.5,
                     }}
                 >
-                    <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
+                    <FormattedMessage id='widget.heading' defaultMessage='Recent Api Alerts' />
                 </h3>
                 <h3
                 style={{
                     fontWeight: 'normal',
                     paddingBottom: '20px'
                 }}>
-                   Total Traffic: 225 TPS
+                   Total Traffi: 225 TPS
                 </h3>
             </div>
 
             <div style={styles.dataWrapper}>
-                    <VictoryChart theme={chartTheme} domainPadding={{x: 40}}>
-                        <VictoryBar
-                        style={{ display: "flex", flexWrap: "wrap", data: {fill: "#b3b9c4"} }}
-                        animate={{
-                            duration: 2000,
-                            onLoad: { duration: 1000 }
-                            }}
-                        data={dataset}
+                    {/* <VictoryChart
+                theme={chartTheme}
+                // domain={{ y: [0.5, 5.5] }}
+                domainPadding={{x: 30}}
+                >
+                <VictoryGroup offset={10}
+                    style={{ data: { width: 6 } }}
+                    colorScale="qualitative"
+                    >
+                    <VictoryBar
+                        data={dataset1}
                         x="API"
-                        y="Traffic"
-                        />
-                        <VictoryAxis
+                        y="MaxLatency"
                         label="API Name"
-                        style={{
-                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
-                        }}
-                        />
-                        <VictoryAxis dependentAxis
-                        label="Total Traffic"
-                        style={{
-                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
-                        }}
-                        />
-                    </VictoryChart>
+                    />
+                    <VictoryBar
+                        data={dataset2}
+                        x="API"
+                        y="TopLatency"
+                    />
+                </VictoryGroup>
+                </VictoryChart> */}
+                <VizG config={config} data={data} metadata={metadata} />
 
             </div>
         </div>
     );
 }
 
-APIMApiTest.propTypes = {
+APIMApiLatency.propTypes = {
     themeName: PropTypes.string.isRequired,
     totalCount: PropTypes.string.isRequired,
     weekCount: PropTypes.string.isRequired,

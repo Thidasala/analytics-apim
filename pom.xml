@@ -816,6 +816,24 @@
             </dependency>
 
             <!-- WSO2 APIM widgets-->
+             <dependency>
+                <groupId>org.wso2.analytics.apim</groupId>
+                <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics.apim</groupId>
+                <artifactId>org.wso2.analytics.apim.widgets.apim.api.error.rate</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics.apim</groupId>
+                <artifactId>org.wso2.analytics.apim.widgets.apim.api.alerts</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.analytics.apim</groupId>
                 <artifactId>org.wso2.analytics.apim.feature</artifactId>

@@ -32,7 +32,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Widget from '@wso2-dashboards/widget';
-import APIMApiTest from './APIMApiTest';
+import APIMApiLatency from './APIMApiLatency';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -58,7 +58,7 @@ const language = (navigator.languages && navigator.languages[0]) || navigator.la
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
 
-class APIMApiTestWidget extends Widget {
+class APIMApiLatencyWidget extends Widget {
 
     constructor(props) {
         super(props);
@@ -142,10 +142,10 @@ class APIMApiTestWidget extends Widget {
 
     /**
      * Load locale file.
-     * @memberof APIMApiTestWidget
+     * @memberof APIMApiLatencyWidget
      */
     loadLocale(locale) {
-        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiTest/locales/${locale}.json`)
+        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiLatency/locales/${locale}.json`)
             .then((response) => {
                 this.setState({ localeMessages: defineMessages(response.data) });
             })
@@ -154,7 +154,7 @@ class APIMApiTestWidget extends Widget {
 
     /**
      * Formats the siddhi query
-     * @memberof APIMApiTestWidget
+     * @memberof APIMApiLatencyWidget
      * */
     assembletotalQuery() {
         const { providerConfig } = this.state;
@@ -169,7 +169,7 @@ class APIMApiTestWidget extends Widget {
     /**
      * Formats data received from assembletotalQuery
      * @param {object} message - data retrieved
-     * @memberof APIMApiTestWidget
+     * @memberof APIMApiLatencyWidget
      * */
     handleTotalCountReceived(message) {
         const { data } = message;
@@ -184,7 +184,7 @@ class APIMApiTestWidget extends Widget {
 
     /**
      * Formats the siddhi query using selected options
-     * @memberof APIMApiTestWidget
+     * @memberof APIMApiLatencyWidget
      * */
     assembleweekQuery() {
         const { providerConfig } = this.state;
@@ -204,7 +204,7 @@ class APIMApiTestWidget extends Widget {
     /**
      * Formats data received from assembleweekQuery
      * @param {object} message - data retrieved
-     * @memberof APIMApiTestWidget
+     * @memberof APIMApiLatencyWidget
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
@@ -216,8 +216,8 @@ class APIMApiTestWidget extends Widget {
 
     /**
      * @inheritDoc
-     * @returns {ReactElement} Render the APIM Api Created widget
-     * @memberof APIMApiTestWidget
+     * @returns {ReactElement} Render the APIM Api Latency Widget
+     * @memberof APIMApiLatencyWidget
      */
     render() {
         const {
@@ -260,7 +260,7 @@ class APIMApiTestWidget extends Widget {
                                 </Paper>
                             </div>
                         ) : (
-                            <APIMApiTest {...apitestProps} />
+                            <APIMApiLatency {...apitestProps} />
                         )
                     }
                 </MuiThemeProvider>
@@ -269,4 +269,4 @@ class APIMApiTestWidget extends Widget {
     }
 }
 
-global.dashboard.registerWidget('APIMApiTest', APIMApiTestWidget);
+global.dashboard.registerWidget('APIMApiLatency', APIMApiLatencyWidget);

@@ -28,6 +28,21 @@
 
     <dependencies>
         <!-- Widgets-->
+        <dependency>
+            <groupId>org.wso2.analytics.apim</groupId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.analytics.apim</groupId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.api.error.rate</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.analytics.apim</groupId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.api.alerts</artifactId>
+            <type>zip</type>
+        </dependency>
          <dependency>
             <groupId>org.wso2.analytics.apim</groupId>
             <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.traffic</artifactId>
@@ -228,6 +243,33 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                            <artifactItem>
+                                    <groupId>org.wso2.analytics.apim</groupId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>APIMApiLatency/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.analytics.apim</groupId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.api.error.rate</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>APIMApiErrorRate/**</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.analytics.apim</groupId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.api.alerts</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>APIMApiAlerts/**</includes>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.wso2.analytics.apim</groupId>
                                     <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.traffic</artifactId>
