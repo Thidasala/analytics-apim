@@ -38,7 +38,7 @@ import CustomTable from './CustomTable';
  */
 export default function APIMRecentApiTraffic(props) {
     const {
-        themeName, height, limit, apiCreatedBy, usageData, apiCreatedHandleChange, handleChange,
+        themeName, height, usageData, handleChange,
     } = props;
     const styles = {
         headingWrapper: {
@@ -118,42 +118,12 @@ export default function APIMRecentApiTraffic(props) {
                     }}
                     >
                         <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
+
                     </h3>
                 </div>
                 <div style={styles.formWrapper}>
                     <form style={styles.form}>
-                        <FormControl style={styles.formControl}>
-                            <InputLabel shrink htmlFor='api-createdBy-label-placeholder'>
-                                <FormattedMessage id='createdBy.label' defaultMessage='API Created By' />
-                            </InputLabel>
-                            <Select
-                                value={apiCreatedBy}
-                                onChange={apiCreatedHandleChange}
-                                input={<Input name='apiCreatedBy' id='api-createdBy-label-placeholder' />}
-                                displayEmpty
-                                name='apiCreatedBy'
-                                style={styles.selectEmpty}
-                            >
-                                <MenuItem value='All'>
-                                    <FormattedMessage id='all.menuItem' defaultMessage='All' />
-                                </MenuItem>
-                                <MenuItem value='Me'>
-                                    <FormattedMessage id='me.menuItem' defaultMessage='Me' />
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            id='limit-number'
-                            label={<FormattedMessage id='limit' defaultMessage='Limit :' />}
-                            value={limit}
-                            onChange={handleChange}
-                            type='number'
-                            style={styles.textField}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            margin='normal'
-                        />
+                       
                     </form>
                 </div>
                 <CustomTable
@@ -167,8 +137,6 @@ export default function APIMRecentApiTraffic(props) {
 APIMRecentApiTraffic.propTypes = {
     themeName: PropTypes.string.isRequired,
     height: PropTypes.string.isRequired,
-    limit: PropTypes.string.isRequired,
-    apiCreatedBy: PropTypes.string.isRequired,
     usageData: PropTypes.instanceOf(Object).isRequired,
     apiCreatedHandleChange: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,

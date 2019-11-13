@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -26,51 +27,8 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
-import CustomTableHead from './CustomTableHead';
-import CustomTableToolbar from './CustomTableToolbar';
+import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
 
-/**
- * Compare two values and return the result
- * @param {object} a - data field
- * @param {object} b - data field
- * @param {string} orderBy - column to sort table
- * @return {number}
- * */
-function desc(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-/**
- * Stabilize the data set and sort the data fields
- * @param {object} array - data set
- * @param {object} cmp - method to sort
- * @return {object}
- * */
-function stableSort(array, cmp) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = cmp(a[0], b[0]);
-        if (order !== 0) return order;
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map(el => el[0]);
-}
-
-/**
- * Set the value received from desc() according to 'order'
- * @param {string} order - desc or asc
- * @param {string} orderBy - column to sort table
- * @return {object}
- * */
-function getSorting(order, orderBy) {
-    return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
 
 const styles = theme => ({
     root: {
@@ -125,6 +83,38 @@ const styles = theme => ({
     },
 });
 
+
+// theme for the chart
+const chartTheme = {
+    axis: {
+     style: {
+       tickLabels: {
+         // this changed the color of my numbers to white
+         fill: 'white',
+         fontSize: '8px',
+         angle: 25,
+       },
+       grid: { stroke: 'none' },
+     },
+   },
+ };
+
+
+// dataset for the chart
+const dataset = [];
+
+//set the data for the table
+
+function setdata(data)
+{
+data.forEach(e => {
+    dataset.push({"API": e.apiname, "Traffic": e.hits})
+    console.log(e);
+    //console.log(dataset);
+    //dataset
+});
+}
+
 /**
  * Create React Component for Api Version Usage Summary Table
  */
@@ -139,12 +129,10 @@ class CustomTable extends React.Component {
 
         this.state = {
             tableData: [],
-            page: 0,
-            rowsPerPage: 5,
+           // rowsPerPage: 5,
             orderBy: 'hits',
             order: 'desc',
             expanded: false,
-            filterColumn: 'apiname',
             query: '',
         };
     }
@@ -182,92 +170,60 @@ class CustomTable extends React.Component {
      * Render the Api Version Usage Summary table
      * @return {ReactElement} customTable
      */
+
+    
     render() {
         const { data, classes } = this.props;
-        const {
-            query, expanded, filterColumn, order, orderBy, rowsPerPage, page,
-        } = this.state;
 
-        this.state.tableData = query
-            ? data.filter(x => x[filterColumn].toString().toLowerCase().includes(query.toLowerCase()))
-            : data;
-        const { tableData } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
-
+        //Set the table data
+        setdata(data);
+        
         return (
             <Paper className={classes.root}>
-                <CustomTableToolbar
-                    expanded={expanded}
-                    filterColumn={filterColumn}
-                    query={query}
-                    handleExpandClick={this.handleExpandClick}
-                    handleColumnSelect={this.handleColumnSelect}
-                    handleQueryChange={this.handleQueryChange}
+                  <VictoryChart
+                  theme={chartTheme}
+                  domainPadding={{ x: 30 }}
+                  maxDomain={{ x: 5 }}
+                 >
+                  <VictoryBar
+                    barWidth={6}
+                    style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    data: { fill: '#b3b9c4', width: 5 }
+                  }}
+                    animate={{
+                    duration: 2000,
+                    onLoad: { duration: 1000 },
+                  }}
+                    data={dataset}
+                    x='API'
+                  // eslint-disable-next-line indent
+                    y='Traffic'
                 />
-                <div className={classes.tableWrapper}>
-                    <Table className={classes.table} aria-labelledby='tableTitle'>
-                        <CustomTableHead
-                            order={order}
-                            orderBy={orderBy}
-                            onRequestSort={this.handleRequestSort}
-                        />
-                        <TableBody>
-                            {stableSort(tableData, getSorting(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((n) => {
-                                    return (
-                                        <TableRow
-                                            hover
-                                            tabIndex={-1}
-                                            key={n.id}
-                                        >
-                                            <TableCell component='th' scope='row'>
-                                                {n.apiname}
-                                            </TableCell>
-                                            <TableCell component='th' scope='row'>
-                                                {n.version}
-                                            </TableCell>
-                                            <TableCell numeric>
-                                                {n.hits}
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            {emptyRows > 0 && (
-                                <TableRow style={{ height: 49 * emptyRows }}>
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 20, 25, 50, 100]}
-                    component='div'
-                    count={tableData.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    backIconButtonProps={{
-                        'aria-label': 'Previous Page',
-                    }}
-                    nextIconButtonProps={{
-                        'aria-label': 'Next Page',
-                    }}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                    classes={{
-                        root: classes.paginationRoot,
-                        toolbar: classes.paginationToolbar,
-                        caption: classes.paginationCaption,
-                        selectRoot: classes.paginationSelectRoot,
-                        select: classes.paginationSelect,
-                        selectIcon: classes.paginationSelectIcon,
-                        input: classes.paginationInput,
-                        menuItem: classes.paginationMenuItem,
-                        actions: classes.paginationActions,
-                    }}
+                  <VictoryAxis
+                    label='API Name'
+                    style={{
+                    axisLabel: {
+                      padding: 30,
+                      fill: '#ffffff',
+                      fontSize: '8px',
+                    },
+                  }}
                 />
-            </Paper>
+                  <VictoryAxis
+                    dependentAxis
+                    label='Total Traffic'
+                    style={{
+                    axisLabel: {
+                      padding: 30,
+                      fill: '#ffffff',
+                      fontSize: '8px',
+                    },
+                  }}
+                />
+              </VictoryChart>
+          </Paper>
         );
     }
 }

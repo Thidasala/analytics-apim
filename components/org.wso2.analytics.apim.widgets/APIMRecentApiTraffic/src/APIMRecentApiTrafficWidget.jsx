@@ -50,43 +50,19 @@ const lightTheme = createMuiTheme({
     },
 });
 
-/**
-* Query string parameter values
-* @type {object}
-*/
-const createdByKeys = {
-    All: 'All',
-    Me: 'Me',
-};
 
-/**
- * Query string parameter
- * @type {string}
- */
-const queryParamKey = 'apiversionusage';
 
-/**
- * Language
- * @type {string}
- */
+const queryParamKey = 'recentapitraffic';
+
+
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
-/**
- * Language without region code
- */
+
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
-/**
- * Create React Component for Recent Api Traffic widget
- * @class APIMRecentApiTrafficWidget
- * @extends {Widget}
- */
+//Create react component for the APIM Recent Api Traffic
 class APIMRecentApiTrafficWidget extends Widget {
-    /**
-     * Creates an instance of APIMRecentApiTrafficWidget.
-     * @param {any} props @inheritDoc
-     * @memberof APIMRecentApiTrafficWidget
-     */
+   
     constructor(props) {
         super(props);
         this.styles = {
@@ -111,13 +87,12 @@ class APIMRecentApiTrafficWidget extends Widget {
             },
         };
 
+        
         this.state = {
             width: this.props.width,
             height: this.props.height,
-            apiCreatedBy: 'All',
-            limit: 0,
             usageData: null,
-            localeMessages: null,
+            localeMessages: null
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -135,6 +110,7 @@ class APIMRecentApiTrafficWidget extends Widget {
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
     }
+
 
     componentDidMount() {
         const { widgetID } = this.props;
@@ -159,11 +135,7 @@ class APIMRecentApiTrafficWidget extends Widget {
         super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
     }
 
-    /**
-     * Load locale file.
-     * @param {string} locale Locale name
-     * @memberof APIMRecentApiTrafficWidget
-     */
+ 
     loadLocale(locale) {
         Axios.get(`${window.contextPath}/public/extensions/widgets/APIMRecentApiTraffic/locales/${locale}.json`)
             .then((response) => {
@@ -172,10 +144,7 @@ class APIMRecentApiTrafficWidget extends Widget {
             .catch(error => console.error(error));
     }
 
-    /**
-     * Retrieve params from publisher - DateTimeRange
-     * @memberof APIMRecentApiTrafficWidget
-     * */
+    //Set the date time range
     handlePublisherParameters(receivedMsg) {
         this.setState({
             timeFrom: receivedMsg.from,
@@ -184,32 +153,10 @@ class APIMRecentApiTrafficWidget extends Widget {
         }, this.assembleApiUsageQuery);
     }
 
-    /**
-     * Reset the state according to queryParam
-     * @memberof APIMRecentApiTrafficWidget
-     * */
-    resetState() {
-        const queryParam = super.getGlobalState(queryParamKey);
-        let { apiCreatedBy } = queryParam;
-        let { limit } = queryParam;
-        if (!apiCreatedBy) {
-            apiCreatedBy = 'All';
-        }
-        if (!limit) {
-            limit = 5;
-        }
-        this.setState({ apiCreatedBy, limit });
-        this.setQueryParam(apiCreatedBy, limit);
-    }
-
-    /**
-     * Formats the siddhi query - apiusagequery
-     * @memberof APIMRecentApiTrafficWidget
-     * */
+  
+    //Format the siddhi query
     assembleApiUsageQuery() {
-        this.resetState();
         const queryParam = super.getGlobalState(queryParamKey);
-        const { limit } = queryParam;
         const {
             timeFrom, timeTo, perValue, providerConfig,
         } = this.state;
@@ -220,55 +167,30 @@ class APIMRecentApiTrafficWidget extends Widget {
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-            '{{per}}': perValue,
-            '{{limit}}': limit
+            '{{per}}': perValue
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleApiUsageReceived, dataProviderConfigs);
     }
 
-    /**
-     * Formats data retrieved from assembleApiUsageQuery
-     * @param {object} message - data retrieved
-     * @memberof APIMRecentApiTrafficWidget
-     * */
+   
+    //format the query data
     handleApiUsageReceived(message) {
         const { data } = message;
-        console.log(data);
-        const currentUser = super.getCurrentUser();
-        const { apiCreatedBy, limit } = this.state;
 
         if (data) {
             const usageData = [];
             const counter = 0;
 
             data.forEach((dataUnit) => {
-                if (apiCreatedBy === createdByKeys.All) {
                     usageData.push({
                         id: counter, apiname: dataUnit[0], version: dataUnit[1], hits: dataUnit[3],
                     });
-                } else if (apiCreatedBy === createdByKeys.Me) {
-                    if (currentUser.username === dataUnit[2]) {
-                        usageData.push({
-                            id: counter, apiname: dataUnit[0], version: dataUnit[1], hits: dataUnit[3],
-                        });
-                    }
-                }
             });
             this.setState({ usageData });
-            this.setQueryParam(apiCreatedBy, limit);
         }
     }
 
-    /**
-     * Updates query param values
-     * @param {string} apiCreatedBy - API Created By menu option selected
-     * @param {number} limit - data limitation value
-     * @memberof APIMRecentApiTrafficWidget
-     * */
-    setQueryParam(apiCreatedBy, limit) {
-        super.setGlobalState(queryParamKey, { apiCreatedBy, limit });
-    }
 
     /**
      * Handle Limit select Change
@@ -276,10 +198,9 @@ class APIMRecentApiTrafficWidget extends Widget {
      * @memberof APIMRecentApiTrafficWidget
      * */
     handleChange(event) {
-        const { apiCreatedBy } = this.state;
         const { id } = this.props;
 
-        this.setQueryParam(apiCreatedBy, event.target.value);
+        this.setQueryParam(event.target.value);
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleApiUsageQuery();
     }
@@ -290,10 +211,10 @@ class APIMRecentApiTrafficWidget extends Widget {
      * @memberof APIMRecentApiTrafficWidget
      * */
     apiCreatedHandleChange(event) {
-        const { limit } = this.state;
+       // const { limit } = this.state;
         const { id } = this.props;
 
-        this.setQueryParam(event.target.value, limit);
+        this.setQueryParam(event.target.value);
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleApiUsageQuery();
     }
@@ -305,7 +226,7 @@ class APIMRecentApiTrafficWidget extends Widget {
      */
     render() {
         const {
-            localeMessages, faultyProviderConfig, height, limit, apiCreatedBy, usageData,
+            localeMessages, faultyProviderConfig, height, usageData,
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
@@ -313,7 +234,7 @@ class APIMRecentApiTrafficWidget extends Widget {
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
         const apiUsageProps = {
-            themeName, height, limit, apiCreatedBy, usageData,
+            themeName, height, usageData,
         };
 
         if (!localeMessages || !usageData) {
