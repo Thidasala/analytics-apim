@@ -21,7 +21,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Scrollbars } from 'react-custom-scrollbars';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -30,18 +29,16 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import VizG from 'react-vizgrammar';
 import CustomTable from './CustomTable';
 
 /**
- * React Component for Api Overall Api Usage widget body
+ * React Component for Recent Api Traffic widget body
  * @param {any} props @inheritDoc
- * @returns {ReactElement} Render the Overall Api Usage widget body
+ * @returns {ReactElement} Render the Recent Api Traffic widget body
  */
 export default function APIMRecentApiTraffic(props) {
     const {
-        themeName, width, height, limit, apiCreatedBy, usageData1, metadata, chartConfig, apiCreatedHandleChange,
-        limitHandleChange, inProgress,
+        themeName, height, limit, apiCreatedBy, usageData, apiCreatedHandleChange, handleChange,
     } = props;
     const styles = {
         headingWrapper: {
@@ -80,41 +77,37 @@ export default function APIMRecentApiTraffic(props) {
         selectEmpty: {
             marginTop: 10,
         },
-        dataWrapper: {
-            height: '80%',
-        },
-        chartWrapper: {
-            width: '100%',
-            height: '70%',
-        },
-        tableWrapper: {
-            width: '80%',
-            height: '30%',
-            margin: 'auto',
-        },
-        loadingIcon: {
-            margin: 'auto',
-            display: 'block',
-        },
-        loading: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height,
-        },
     };
-
+    if (usageData.length === 0) {
+        return (
+            <div style={styles.paperWrapper}>
+                <Paper
+                    elevation={1}
+                    style={styles.paper}
+                >
+                    <Typography variant='h5' component='h3'>
+                        <FormattedMessage id='nodata.error.heading' defaultMessage='No Data Available !' />
+                    </Typography>
+                    <Typography component='p'>
+                        <FormattedMessage
+                            id='nodata.error.body'
+                            defaultMessage='No data available for the selected options.'
+                        />
+                    </Typography>
+                </Paper>
+            </div>
+        );
+    }
     return (
         <Scrollbars
-            style={{ height: '100%' }}
+            style={{ height }}
         >
-            <div
-                style={{
-                    padding: '5% 5%',
-                }}
+            <div style={{
+                padding: '5% 5%',
+            }}
             >
                 <div style={styles.headingWrapper}>
-                    <div style={{
+                    <h3 style={{
                         borderBottom: themeName === 'dark' ? '1px solid #fff' : '1px solid #02212f',
                         paddingBottom: '10px',
                         margin: 'auto',
@@ -124,27 +117,27 @@ export default function APIMRecentApiTraffic(props) {
                         letterSpacing: 1.5,
                     }}
                     >
-                        <FormattedMessage id='widget.heading' defaultMessage='OVERALL API USAGE' />
-                    </div>
+                        <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
+                    </h3>
                 </div>
                 <div style={styles.formWrapper}>
-                    <form style={styles.form} noValidate autoComplete='off'>
+                    <form style={styles.form}>
                         <FormControl style={styles.formControl}>
                             <InputLabel shrink htmlFor='api-createdBy-label-placeholder'>
-                                <FormattedMessage id='api.createdBy.label' defaultMessage='API Created By' />
+                                <FormattedMessage id='createdBy.label' defaultMessage='API Created By' />
                             </InputLabel>
                             <Select
                                 value={apiCreatedBy}
                                 onChange={apiCreatedHandleChange}
-                                input={<Input name='api-createdBy' id='api-createdBy-label-placeholder' />}
+                                input={<Input name='apiCreatedBy' id='api-createdBy-label-placeholder' />}
                                 displayEmpty
                                 name='apiCreatedBy'
                                 style={styles.selectEmpty}
                             >
-                                <MenuItem value='all'>
+                                <MenuItem value='All'>
                                     <FormattedMessage id='all.menuItem' defaultMessage='All' />
                                 </MenuItem>
-                                <MenuItem value='me'>
+                                <MenuItem value='Me'>
                                     <FormattedMessage id='me.menuItem' defaultMessage='Me' />
                                 </MenuItem>
                             </Select>
@@ -153,7 +146,7 @@ export default function APIMRecentApiTraffic(props) {
                             id='limit-number'
                             label={<FormattedMessage id='limit' defaultMessage='Limit :' />}
                             value={limit}
-                            onChange={limitHandleChange}
+                            onChange={handleChange}
                             type='number'
                             style={styles.textField}
                             InputLabelProps={{
@@ -163,54 +156,9 @@ export default function APIMRecentApiTraffic(props) {
                         />
                     </form>
                 </div>
-                { !usageData1 || inProgress ? (
-                    <div style={styles.loading}>
-                        <CircularProgress style={styles.loadingIcon} />
-                    </div>
-                    ) : (
-                        <div>
-                            {
-                                usageData1.length === 0 ? (
-                                    <div style={styles.paperWrapper}>
-                                        <Paper
-                                            elevation={1}
-                                            style={styles.paper}
-                                        >
-                                            <Typography variant='h5' component='h3'>
-                                                <FormattedMessage
-                                                    id='nodata.error.heading'
-                                                    defaultMessage='No Data Available !' />
-                                            </Typography>
-                                            <Typography component='p'>
-                                                <FormattedMessage
-                                                    id='nodata.error.body'
-                                                    defaultMessage='No data available for the selected options.'
-                                                />
-                                            </Typography>
-                                        </Paper>
-                                    </div>
-                                ) : (
-                                    <div style={styles.dataWrapper}>
-                                        <div style={styles.chartWrapper}>
-                                            <VizG
-                                                config={chartConfig}
-                                                metadata={metadata}
-                                                data={usageData1}
-                                                width={width}
-                                                theme={themeName}
-                                            />
-                                        </div>
-                                        <div style={styles.tableWrapper}>
-                                            <CustomTable
-                                                data={usageData1}
-                                            />
-                                        </div>
-                                    </div>
-                                )
-                            }
-                        </div>
-                    )
-                }
+                <CustomTable
+                    data={usageData}
+                />
             </div>
         </Scrollbars>
     );
@@ -218,12 +166,10 @@ export default function APIMRecentApiTraffic(props) {
 
 APIMRecentApiTraffic.propTypes = {
     themeName: PropTypes.string.isRequired,
-    width: PropTypes.string.isRequired,
+    height: PropTypes.string.isRequired,
     limit: PropTypes.string.isRequired,
     apiCreatedBy: PropTypes.string.isRequired,
-    usageData1: PropTypes.instanceOf(Object).isRequired,
-    metadata: PropTypes.instanceOf(Object).isRequired,
-    chartConfig: PropTypes.instanceOf(Object).isRequired,
+    usageData: PropTypes.instanceOf(Object).isRequired,
     apiCreatedHandleChange: PropTypes.func.isRequired,
-    limitHandleChange: PropTypes.func.isRequired,
+    handleChange: PropTypes.func.isRequired,
 };

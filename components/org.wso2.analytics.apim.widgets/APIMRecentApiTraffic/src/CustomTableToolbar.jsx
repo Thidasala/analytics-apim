@@ -82,7 +82,7 @@ function CustomTableToolbar(props) {
         >
             <div className={classes.title}>
                 <Typography variant='h6' id='tableTitle'>
-                    <FormattedMessage id='table.main.heading' defaultMessage='OVERALL API USAGE (ALL VERSIONS) :' />
+                    <FormattedMessage id='widget.heading' defaultMessage='API VERSION USAGE SUMMARY' />
                 </Typography>
             </div>
             <div className={classes.actions}>
@@ -115,6 +115,9 @@ function CustomTableToolbar(props) {
                     >
                         <MenuItem value='apiname'>
                             <FormattedMessage id='table.heading.apiname' defaultMessage='API NAME' />
+                        </MenuItem>
+                        <MenuItem value='version'>
+                            <FormattedMessage id='table.heading.version' defaultMessage='VERSION' />
                         </MenuItem>
                         <MenuItem value='hits'>
                             <FormattedMessage id='table.heading.hits' defaultMessage='HITS' />

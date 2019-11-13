@@ -11,8 +11,7 @@
         "lodash": "^4.17.11",
         "axios": "^0.16.2",
         "react-intl": "^2.8.0",
-        "rimraf": "^2.6.3",
-        "react-vizgrammar": "^0.7.39"
+        "rimraf": "^2.6.3"
     },
     "scripts": {
         "build": "webpack -p",

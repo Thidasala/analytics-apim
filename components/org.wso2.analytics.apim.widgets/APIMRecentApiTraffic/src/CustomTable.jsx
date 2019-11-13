@@ -126,7 +126,7 @@ const styles = theme => ({
 });
 
 /**
- * Create React Component for Ovearll Api Usage Table
+ * Create React Component for Api Version Usage Summary Table
  */
 class CustomTable extends React.Component {
     /**
@@ -179,26 +179,18 @@ class CustomTable extends React.Component {
     };
 
     /**
-     * Render the Overall Api Usage table
+     * Render the Api Version Usage Summary table
      * @return {ReactElement} customTable
      */
     render() {
         const { data, classes } = this.props;
-        let counter = 0;
-        // const formattedData = [];
-        let apiname = '';
-        let hits = 0;
         const {
             query, expanded, filterColumn, order, orderBy, rowsPerPage, page,
         } = this.state;
 
-        const formattedData = data.map((dataUnit) => {
-            return { apiname: dataUnit[0] + ' (' + dataUnit[1] + ')', hits: dataUnit[2] };
-        });
-
         this.state.tableData = query
-            ? formattedData.filter(x => x[filterColumn].toString().toLowerCase().includes(query.toLowerCase()))
-            : formattedData;
+            ? data.filter(x => x[filterColumn].toString().toLowerCase().includes(query.toLowerCase()))
+            : data;
         const { tableData } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
 
@@ -227,9 +219,13 @@ class CustomTable extends React.Component {
                                         <TableRow
                                             hover
                                             tabIndex={-1}
+                                            key={n.id}
                                         >
                                             <TableCell component='th' scope='row'>
                                                 {n.apiname}
+                                            </TableCell>
+                                            <TableCell component='th' scope='row'>
+                                                {n.version}
                                             </TableCell>
                                             <TableCell numeric>
                                                 {n.hits}

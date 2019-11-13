@@ -31,6 +31,9 @@ const rows = [
         id: 'apiname', numeric: false, disablePadding: false, label: 'table.heading.apiname',
     },
     {
+        id: 'version', numeric: false, disablePadding: false, label: 'table.heading.version',
+    },
+    {
         id: 'hits', numeric: true, disablePadding: false, label: 'table.heading.hits',
     },
 ];
