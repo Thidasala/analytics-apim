@@ -52,6 +52,7 @@ const lightTheme = createMuiTheme({
     },
 });
 
+const queryParamKey = 'apierrorrate'
 
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
@@ -69,7 +70,7 @@ class APIMApiErrorRateWidget extends Widget {
             totalCount: 0,
             weekCount: 0,
             localeMessages: null,
-            refreshInterval: 60000, // 1min
+            // refreshInterval: 60000, // 1min
         };
 
         this.styles = {
@@ -79,7 +80,7 @@ class APIMApiErrorRateWidget extends Widget {
             },
             paper: {
                 padding: '5%',
-                border: '10px solid #4555BB',
+                border: '2px solid #4555BB',
             },
             paperWrapper: {
                 margin: 'auto',
@@ -101,31 +102,33 @@ class APIMApiErrorRateWidget extends Widget {
                 height: this.props.glContainer.height,
             }));
         }
-
+        this.handleChange = this.handleChange.bind(this);
+        this.apiErrorHandleChange = this.apiErrorHandleChange.bind(this);
         this.assembleweekQuery = this.assembleweekQuery.bind(this);
         this.assembletotalQuery = this.assembletotalQuery.bind(this);
         this.handleWeekCountReceived = this.handleWeekCountReceived.bind(this);
         this.handleTotalCountReceived = this.handleTotalCountReceived.bind(this);
+        this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
     }
 
     componentDidMount() {
         const { widgetID, id } = this.props;
-        const { refreshInterval } = this.state;
+        //const { refreshInterval } = this.state;
         const locale = languageWithoutRegionCode || language;
         this.loadLocale(locale);
 
         super.getWidgetConfiguration(widgetID)
             .then((message) => {
-                // set an interval to periodically retrieve data
-                const refresh = () => {
-                    super.getWidgetChannelManager().unsubscribeWidget(id);
-                    this.assembletotalQuery();
-                };
-                setInterval(refresh, refreshInterval);
+                // // set an interval to periodically retrieve data
+                // const refresh = () => {
+                //     super.getWidgetChannelManager().unsubscribeWidget(id);
+                //     this.assembletotalQuery();
+                // };
+                // setInterval(refresh, refreshInterval);
                 this.setState({
                     providerConfig: message.data.configs.providerConfig,
-                }, this.assembletotalQuery);
+                }, () => super.subscribe(this.handlePublisherParameters));
             })
             .catch((error) => {
                 console.error("Error occurred when loading widget '" + widgetID + "'. " + error);
@@ -134,6 +137,16 @@ class APIMApiErrorRateWidget extends Widget {
                 });
             });
     }
+   
+    //Set the date time range
+    handlePublisherParameters(receivedMsg) {
+        this.setState({
+            timeFrom: receivedMsg.from,
+            timeTo: receivedMsg.to,
+            perValue: receivedMsg.granularity,
+        },  this.assembletotalQuery);
+    }
+
 
     componentWillUnmount() {
         const { id } = this.props;
@@ -152,29 +165,28 @@ class APIMApiErrorRateWidget extends Widget {
             .catch(error => console.error(error));
     }
 
-    /**
-     * Formats the siddhi query
-     * @memberof APIMApiErrorRateWidget
-     * */
+    //format the siddhi query
     assembletotalQuery() {
-        const { providerConfig } = this.state;
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
         dataProviderConfigs.configs.config.queryData.queryName = 'totalQuery';
+        dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+            '{{per}}': perValue
+        };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
     }
 
-    /**
-     * Formats data received from assembletotalQuery
-     * @param {object} message - data retrieved
-     * @memberof APIMApiErrorRateWidget
-     * */
+    // format the total error count received
     handleTotalCountReceived(message) {
         const { data } = message;
         const { id } = this.props;
-
+        console.log(data)
         if (data.length !== 0) {
             this.setState({ totalCount:  data.length < 10 ? ('0' + data.length) : data.length });
         }
@@ -187,15 +199,16 @@ class APIMApiErrorRateWidget extends Widget {
      * @memberof APIMApiErrorRateWidget
      * */
     assembleweekQuery() {
-        const { providerConfig } = this.state;
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
-        const weekStart = Moment().subtract(7, 'days');
 
         const dataProviderConfigs = cloneDeep(providerConfig);
         dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
         dataProviderConfigs.configs.config.queryData.queryValues = {
-            '{{weekStart}}': Moment(weekStart).format('YYYY-MM-DD HH:mm:ss'),
-            '{{weekEnd}}': Moment().format('YYYY-MM-DD HH:mm:ss')
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+            '{{per}}': perValue
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
@@ -214,11 +227,25 @@ class APIMApiErrorRateWidget extends Widget {
         }
     }
 
-    /**
-     * @inheritDoc
-     * @returns {ReactElement} Render the APIM Api Created widget
-     * @memberof APIMApiErrorRateWidget
-     */
+    handleChange(event) {
+        const { id } = this.props;
+
+        this.setQueryParam(event.target.value);
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assembletotalQuery();
+    }
+
+    apiErrorHandleChange(event) {
+        // const { limit } = this.state;
+         const { id } = this.props;
+ 
+         this.setQueryParam(event.target.value);
+         super.getWidgetChannelManager().unsubscribeWidget(id);
+         this.assembletotalQuery();
+     }
+
+
+    
     render() {
         const {
             localeMessages, faultyProviderConf, totalCount, weekCount,
@@ -229,7 +256,7 @@ class APIMApiErrorRateWidget extends Widget {
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
         const apitestProps = { themeName, totalCount, weekCount };
-
+        
         if (!localeMessages) {
             return (
                 <div style={inProgress}>
