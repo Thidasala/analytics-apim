@@ -45,6 +45,7 @@ export default function APIMApiTest(props) {
               fontSize: '9px',
               angle: 25
             },
+            grid: { stroke: "none" },
           },
         },
       };
@@ -126,8 +127,9 @@ export default function APIMApiTest(props) {
             </div>
 
             <div style={styles.dataWrapper}>
-                    <VictoryChart theme={chartTheme} domainPadding={{x: 40}}>
+                    <VictoryChart theme={chartTheme} domainPadding={{x: 40}} maxDomain={{ x: 5 }}>
                         <VictoryBar
+                        barWidth={10}
                         style={{ display: "flex", flexWrap: "wrap", data: {fill: "#b3b9c4"} }}
                         animate={{
                             duration: 2000,

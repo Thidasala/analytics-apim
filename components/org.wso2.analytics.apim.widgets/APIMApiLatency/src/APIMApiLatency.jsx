@@ -39,20 +39,24 @@ export default function APIMApiLatency(props) {
 
     //configuration for chart
     let config = {
-        x : "rpm",
-        charts : [{type: "line", y : "torque", color: "EngineType"}],
-        maxLength: 10,
-        width: 400,
-        height: 200
+        x : "API",
+        charts : [{type: "bar", y : "Latency", colour : "latencytype"},],
+        maxLength: 7,
+        
     }
 
-    metadata = {
-        "names" : ["rpm", "torque", "horsepower", "EngineType"],
-        "types" : ["linear", "linear", "ordinal", "ordinal"]
+    let metadata = {
+        names : ['API', 'Latency', 'latencytype'],
+        types : ['linear', 'linear', 'ordinal']
     };
 
-    data = [
-        [8000, 75, 120, "Piston"], [9000, 81, 130, "Rotary"]
+    let data = [
+        ['API1', 1000, 'latencytype1'],
+        ['API2', 500, 'latencytype2'],
+        ['API3', 100, 'latencytype1'],
+        ['API4', 10, 'latencytype2'],
+        ['API5', 100, 'latencytype1'],
+      
     ];
 
     const chartTheme = {
@@ -63,7 +67,8 @@ export default function APIMApiLatency(props) {
               fill: 'white',
               fontSize: '9px',
               angle: 25
-            },grid: { stroke: "none" }
+            },
+            grid: { stroke: "none" },
           },
         },
       };
@@ -75,14 +80,6 @@ export default function APIMApiLatency(props) {
         { API: 'API4', MaxLatency: 2 },
         { API: 'API5', MaxLatency: 1 }
         ];
-
-    const dataset2 = [
-        { API: 'API1', TopLatency: 2 },
-        { API: 'API2', TopLatency: 3 },
-        { API: 'API3', TopLatency: 4 },
-        { API: 'API4', TopLatency: 5 },
-        { API: 'API5', TopLatency: 5 }
-        ]
 
 
     const { themeName, totalCount, weekCount } = props;
@@ -150,35 +147,37 @@ export default function APIMApiLatency(props) {
                     fontWeight: 'normal',
                     paddingBottom: '20px'
                 }}>
-                   Total Traffi: 225 TPS
+                   Top latency: 225 Ms
                 </h3>
             </div>
 
             <div style={styles.dataWrapper}>
-                    {/* <VictoryChart
-                theme={chartTheme}
-                // domain={{ y: [0.5, 5.5] }}
-                domainPadding={{x: 30}}
-                >
-                <VictoryGroup offset={10}
-                    style={{ data: { width: 6 } }}
-                    colorScale="qualitative"
-                    >
-                    <VictoryBar
-                        data={dataset1}
+            <VictoryChart theme={chartTheme} domainPadding={{x: 40}} colorScale="qualitative" maxDomain={{ x: 5 }}>
+            <VictoryBar
+                    barWidth={10}
+                    style={{ display: "flex", flexWrap: "wrap", data: {fill: "#b3b9c4"} }}
+                    animate={{
+                        duration: 2000,
+                        onLoad: { duration: 1000 }
+                        }}
+                    data={dataset1}
                         x="API"
                         y="MaxLatency"
+                        
+                        />
+                        <VictoryAxis
                         label="API Name"
-                    />
-                    <VictoryBar
-                        data={dataset2}
-                        x="API"
-                        y="TopLatency"
-                    />
-                </VictoryGroup>
-                </VictoryChart> */}
-                <VizG config={config} data={data} metadata={metadata} />
-
+                        style={{
+                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px'}
+                        }}
+                        />
+                        <VictoryAxis dependentAxis
+                        label="Top Latency"
+                        style={{
+                            axisLabel: { padding: 30, fill: "#ffffff", fontSize: '11px' }
+                        }}
+                        />
+             </VictoryChart>
             </div>
         </div>
     );

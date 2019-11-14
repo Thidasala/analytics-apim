@@ -1,3 +1,5 @@
+/* eslint-disable require-jsdoc */
+/* eslint-disable no-console */
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -232,6 +234,7 @@ class APIMApiVersionUsageWidget extends Widget {
      * */
     handleApiUsageReceived(message) {
         const { data } = message;
+        console.log(data);
         const currentUser = super.getCurrentUser();
         const { apiCreatedBy, limit } = this.state;
 

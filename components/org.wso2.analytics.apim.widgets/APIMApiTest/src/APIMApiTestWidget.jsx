@@ -52,6 +52,8 @@ const lightTheme = createMuiTheme({
     },
 });
 
+const queryParamKey = 'apimapitest';
+
 
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
@@ -125,7 +127,7 @@ class APIMApiTestWidget extends Widget {
                 setInterval(refresh, refreshInterval);
                 this.setState({
                     providerConfig: message.data.configs.providerConfig,
-                }, this.assembletotalQuery);
+                }, () => super.subscribe(this.handlePublisherParameters));
             })
             .catch((error) => {
                 console.error("Error occurred when loading widget '" + widgetID + "'. " + error);
@@ -138,6 +140,18 @@ class APIMApiTestWidget extends Widget {
     componentWillUnmount() {
         const { id } = this.props;
         super.getWidgetChannelManager().unsubscribeWidget(id);
+    }
+
+    /**
+     * Retrieve params from publisher - DateTimeRange
+     * @memberof APIMApiTestWidget
+     * */
+    handlePublisherParameters(receivedMsg) {
+        this.setState({
+            timeFrom: receivedMsg.from,
+            timeTo: receivedMsg.to,
+            perValue: receivedMsg.granularity,
+        }, this.assembletotalQuery);
     }
 
     /**
@@ -174,16 +188,18 @@ class APIMApiTestWidget extends Widget {
     handleTotalCountReceived(message) {
         const { data } = message;
         const { id } = this.props;
+        console.log(data);
 
         if (data.length !== 0) {
             this.setState({ totalCount:  data.length < 10 ? ('0' + data.length) : data.length });
         }
+        console.log(this.state.totalCount);
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleweekQuery();
     }
 
     /**
-     * Formats the siddhi query using selected options
+     * Formats the siddhi query using selected options 
      * @memberof APIMApiTestWidget
      * */
     assembleweekQuery() {

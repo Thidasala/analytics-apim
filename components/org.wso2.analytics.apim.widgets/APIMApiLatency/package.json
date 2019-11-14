@@ -11,6 +11,7 @@
         "moment": "^2.24.0",
         "react": "^16.7.0",
         "react-intl": "^2.8.0",
+        "react-vizgrammar": "^0.8.6",
         "rimraf": "^2.6.3",
         "victory": "^33.1.2"
     },
