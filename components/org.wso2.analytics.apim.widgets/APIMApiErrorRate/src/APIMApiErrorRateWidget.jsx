@@ -1,5 +1,6 @@
-/* eslint-disable require-jsdoc */
 /* eslint-disable no-console */
+/* eslint-disable valid-jsdoc */
+/* eslint-disable require-jsdoc */
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -25,12 +26,13 @@ import {
 } from 'react-intl';
 import Axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
+import Moment from 'moment';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Widget from '@wso2-dashboards/widget';
-import APIMRecentApiTraffic from './APIMRecentApiTraffic';
+import APIMApiErrorRate from './APIMApiErrorRate';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -51,20 +53,25 @@ const lightTheme = createMuiTheme({
 });
 
 
-
-const queryParamKey = 'recentapitraffic';
-
-
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
-
 
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
-//Create react component for the APIM Recent Api Traffic
-class APIMRecentApiTrafficWidget extends Widget {
-   
+
+class APIMApiErrorRateWidget extends Widget {
+
     constructor(props) {
         super(props);
+
+        this.state = {
+            width: this.props.width,
+            height: this.props.height,
+            totalCount: 0,
+            weekCount: 0,
+            localeMessages: null,
+            refreshInterval: 60000, // 1min
+        };
+
         this.styles = {
             loadingIcon: {
                 margin: 'auto',
@@ -72,7 +79,7 @@ class APIMRecentApiTrafficWidget extends Widget {
             },
             paper: {
                 padding: '5%',
-                border: '2px solid #4555BB',
+                border: '10px solid #4555BB',
             },
             paperWrapper: {
                 margin: 'auto',
@@ -87,14 +94,6 @@ class APIMRecentApiTrafficWidget extends Widget {
             },
         };
 
-        
-        this.state = {
-            width: this.props.width,
-            height: this.props.height,
-            usageData: null,
-            localeMessages: null
-        };
-
         // This will re-size the widget when the glContainer's width is changed.
         if (this.props.glContainer !== undefined) {
             this.props.glContainer.on('resize', () => this.setState({
@@ -103,25 +102,30 @@ class APIMRecentApiTrafficWidget extends Widget {
             }));
         }
 
-        this.handleChange = this.handleChange.bind(this);
-        this.apiCreatedHandleChange = this.apiCreatedHandleChange.bind(this);
-        this.assembleApiUsageQuery = this.assembleApiUsageQuery.bind(this);
-        this.handleApiUsageReceived = this.handleApiUsageReceived.bind(this);
-        this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
+        this.assembleweekQuery = this.assembleweekQuery.bind(this);
+        this.assembletotalQuery = this.assembletotalQuery.bind(this);
+        this.handleWeekCountReceived = this.handleWeekCountReceived.bind(this);
+        this.handleTotalCountReceived = this.handleTotalCountReceived.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
     }
 
-
     componentDidMount() {
-        const { widgetID } = this.props;
+        const { widgetID, id } = this.props;
+        const { refreshInterval } = this.state;
         const locale = languageWithoutRegionCode || language;
         this.loadLocale(locale);
 
         super.getWidgetConfiguration(widgetID)
             .then((message) => {
+                // set an interval to periodically retrieve data
+                const refresh = () => {
+                    super.getWidgetChannelManager().unsubscribeWidget(id);
+                    this.assembletotalQuery();
+                };
+                setInterval(refresh, refreshInterval);
                 this.setState({
                     providerConfig: message.data.configs.providerConfig,
-                }, () => super.subscribe(this.handlePublisherParameters));
+                }, this.assembletotalQuery);
             })
             .catch((error) => {
                 console.error("Error occurred when loading widget '" + widgetID + "'. " + error);
@@ -132,112 +136,101 @@ class APIMRecentApiTrafficWidget extends Widget {
     }
 
     componentWillUnmount() {
-        super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
+        const { id } = this.props;
+        super.getWidgetChannelManager().unsubscribeWidget(id);
     }
 
- 
+    /**
+     * Load locale file.
+     * @memberof APIMApiErrorRateWidget
+     */
     loadLocale(locale) {
-        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMRecentApiTraffic/locales/${locale}.json`)
+        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiErrorRate/locales/${locale}.json`)
             .then((response) => {
                 this.setState({ localeMessages: defineMessages(response.data) });
             })
             .catch(error => console.error(error));
     }
 
-    //Set the date time range
-    handlePublisherParameters(receivedMsg) {
-        this.setState({
-            timeFrom: receivedMsg.from,
-            timeTo: receivedMsg.to,
-            perValue: receivedMsg.granularity,
-        }, this.assembleApiUsageQuery);
-    }
-
-  
-    //Format the siddhi query
-    assembleApiUsageQuery() {
-        const queryParam = super.getGlobalState(queryParamKey);
-        const {
-            timeFrom, timeTo, perValue, providerConfig,
-        } = this.state;
+    /**
+     * Formats the siddhi query
+     * @memberof APIMApiErrorRateWidget
+     * */
+    assembletotalQuery() {
+        const { providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'apiusagequery';
+        dataProviderConfigs.configs.config.queryData.queryName = 'totalQuery';
+        super.getWidgetChannelManager()
+            .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
+    }
+
+    /**
+     * Formats data received from assembletotalQuery
+     * @param {object} message - data retrieved
+     * @memberof APIMApiErrorRateWidget
+     * */
+    handleTotalCountReceived(message) {
+        const { data } = message;
+        const { id } = this.props;
+
+        if (data.length !== 0) {
+            this.setState({ totalCount:  data.length < 10 ? ('0' + data.length) : data.length });
+        }
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assembleweekQuery();
+    }
+
+    /**
+     * Formats the siddhi query using selected options
+     * @memberof APIMApiErrorRateWidget
+     * */
+    assembleweekQuery() {
+        const { providerConfig } = this.state;
+        const { id, widgetID: widgetName } = this.props;
+        const weekStart = Moment().subtract(7, 'days');
+
+        const dataProviderConfigs = cloneDeep(providerConfig);
+        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
         dataProviderConfigs.configs.config.queryData.queryValues = {
-            '{{from}}': timeFrom,
-            '{{to}}': timeTo,
-            '{{per}}': perValue
+            '{{weekStart}}': Moment(weekStart).format('YYYY-MM-DD HH:mm:ss'),
+            '{{weekEnd}}': Moment().format('YYYY-MM-DD HH:mm:ss')
         };
         super.getWidgetChannelManager()
-            .subscribeWidget(id, widgetName, this.handleApiUsageReceived, dataProviderConfigs);
+            .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
     }
 
-   
-    //format the query data
-    handleApiUsageReceived(message) {
+    /**
+     * Formats data received from assembleweekQuery
+     * @param {object} message - data retrieved
+     * @memberof APIMApiErrorRateWidget
+     * */
+    handleWeekCountReceived(message) {
         const { data } = message;
 
-        if (data) {
-            const usageData = [];
-            const counter = 0;
-
-            data.forEach((dataUnit) => {
-                    usageData.push({
-                        id: counter, apiname: dataUnit[0], version: dataUnit[1], hits: dataUnit[3],
-                    });
-            });
-            this.setState({ usageData });
+        if (data.length !== 0) {
+            this.setState({ weekCount: data.length < 10 ? ('0' + data.length) : data.length });
         }
-    }
-
-
-    /**
-     * Handle Limit select Change
-     * @param {Event} event - listened event
-     * @memberof APIMRecentApiTrafficWidget
-     * */
-    handleChange(event) {
-        const { id } = this.props;
-
-        this.setQueryParam(event.target.value);
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assembleApiUsageQuery();
-    }
-
-    /**
-     * Handle API Created By menu select change
-     * @param {Event} event - listened event
-     * @memberof APIMRecentApiTrafficWidget
-     * */
-    apiCreatedHandleChange(event) {
-       // const { limit } = this.state;
-        const { id } = this.props;
-
-        this.setQueryParam(event.target.value);
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assembleApiUsageQuery();
     }
 
     /**
      * @inheritDoc
-     * @returns {ReactElement} Render the APIM Recent Api Traffic widget
-     * @memberof APIMRecentApiTrafficWidget
+     * @returns {ReactElement} Render the APIM Api Created widget
+     * @memberof APIMApiErrorRateWidget
      */
     render() {
         const {
-            localeMessages, faultyProviderConfig, height, usageData,
+            localeMessages, faultyProviderConf, totalCount, weekCount,
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
         } = this.styles;
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
-        const apiUsageProps = {
-            themeName, height, usageData,
-        };
+        const apitestProps = { themeName, totalCount, weekCount };
 
-        if (!localeMessages || !usageData) {
+        if (!localeMessages) {
             return (
                 <div style={inProgress}>
                     <CircularProgress style={loadingIcon} />
@@ -248,10 +241,10 @@ class APIMRecentApiTrafficWidget extends Widget {
             <IntlProvider locale={languageWithoutRegionCode} messages={localeMessages}>
                 <MuiThemeProvider theme={themeName === 'dark' ? darkTheme : lightTheme}>
                     {
-                        faultyProviderConfig ? (
+                        faultyProviderConf ? (
                             <div style={paperWrapper}>
                                 <Paper elevation={1} style={paper}>
-                                    <Typography variant='h5' component='h3'>
+                                    <Typography variant='h4' component='h3'>
                                         <FormattedMessage
                                             id='config.error.heading'
                                             defaultMessage='Configuration Error !'
@@ -260,18 +253,14 @@ class APIMRecentApiTrafficWidget extends Widget {
                                     <Typography component='p'>
                                         <FormattedMessage
                                             id='config.error.body'
-                                            defaultMessage={'Cannot fetch provider configuration forAPIM Api '
-                                            + 'Recent Api Traffic widget'}
+                                            defaultMessage={'Cannot fetch provider configuration for APIM Api '
+                                            + 'Created widget'}
                                         />
                                     </Typography>
                                 </Paper>
                             </div>
                         ) : (
-                            <APIMRecentApiTraffic
-                                {...apiUsageProps}
-                                apiCreatedHandleChange={this.apiCreatedHandleChange}
-                                handleChange={this.handleChange}
-                            />
+                            <APIMApiErrorRate {...apitestProps} />
                         )
                     }
                 </MuiThemeProvider>
@@ -280,4 +269,4 @@ class APIMRecentApiTrafficWidget extends Widget {
     }
 }
 
-global.dashboard.registerWidget('APIMRecentApiTraffic', APIMRecentApiTrafficWidget);
+global.dashboard.registerWidget('APIMApiErrorRate', APIMApiErrorRateWidget);
