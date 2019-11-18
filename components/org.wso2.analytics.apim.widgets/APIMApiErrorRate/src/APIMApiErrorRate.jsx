@@ -37,13 +37,13 @@ export default function APIMApiErrorRate(props) {
 
 
     const dataset = [
-        { x: 'API1 (20%)', y: 100 },
+        { x: "API1 (2%)", y: 100 },
         { x: 'API2 (15%)', y: 75 },
         { x: 'API3 (10%)', y: 40 },
         { x: 'API4 (8%)', y: 55 }
     ];
 
-    const { themeName, totalCount, weekCount } = props;
+    const { themeName, totalCount, weekCount, sorteddata, errorpercentage } = props;
     const styles = {
         headingWrapper: {
             height: '5%',
@@ -109,7 +109,7 @@ export default function APIMApiErrorRate(props) {
                     paddingBottom: '30px'
                 }}
                 >
-                   Total Error Rate: 57. %
+                   Total Error Rate: {errorpercentage} %
                 </h3>
             </div>
 
@@ -122,7 +122,8 @@ export default function APIMApiErrorRate(props) {
                     }}
                 standalone={false}
                 width={290} height={290}
-                data={dataset}
+                data={sorteddata}
+                
                 innerRadius={0} labelRadius={0}
                 colorScale="qualitative"
                 style={{ labels: { fontSize: 11, fill: "white" } }}
@@ -143,4 +144,7 @@ APIMApiErrorRate.propTypes = {
     themeName: PropTypes.string.isRequired,
     totalCount: PropTypes.string.isRequired,
     weekCount: PropTypes.string.isRequired,
+    sorteddata: PropTypes.string.isRequired,
+    errorpercentage: PropTypes.string.isRequired,
+    //sorteddata: PropTypes.instanceOf(Object).isRequired,
 };

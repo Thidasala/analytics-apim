@@ -20,7 +20,7 @@
           "publishingLimit": 2147483647,
           "purgingInterval": 6,
           "purgingLimit": 6,
-          "isPurgingEnable": true
+          "isPurgingEnable": false
         }
       }
     },

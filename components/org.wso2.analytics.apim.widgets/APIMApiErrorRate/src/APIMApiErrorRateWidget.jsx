@@ -67,9 +67,11 @@ class APIMApiErrorRateWidget extends Widget {
         this.state = {
             width: this.props.width,
             height: this.props.height,
-            totalCount: 0,
-            weekCount: 0,
+            totalCount: null,
+            weekCount: null,
             localeMessages: null,
+            sorteddata: null,
+            errorpercentage: null,
             // refreshInterval: 60000, // 1min
         };
 
@@ -110,6 +112,7 @@ class APIMApiErrorRateWidget extends Widget {
         this.handleTotalCountReceived = this.handleTotalCountReceived.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
+        this.analyzeerrorrate = this.analyzeerrorrate.bind(this);
     }
 
     componentDidMount() {
@@ -153,7 +156,7 @@ class APIMApiErrorRateWidget extends Widget {
         super.getWidgetChannelManager().unsubscribeWidget(id);
     }
 
-    /**
+    /** 
      * Load locale file.
      * @memberof APIMApiErrorRateWidget
      */
@@ -176,7 +179,7 @@ class APIMApiErrorRateWidget extends Widget {
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-            '{{per}}': perValue
+          //  '{{per}}': perValue
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
@@ -186,9 +189,9 @@ class APIMApiErrorRateWidget extends Widget {
     handleTotalCountReceived(message) {
         const { data } = message;
         const { id } = this.props;
-        console.log(data)
+
         if (data.length !== 0) {
-            this.setState({ totalCount:  data.length < 10 ? ('0' + data.length) : data.length });
+            this.setState({ totalCount:  data });
         }
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleweekQuery();
@@ -208,7 +211,7 @@ class APIMApiErrorRateWidget extends Widget {
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-            '{{per}}': perValue
+           // '{{per}}': perValue
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
@@ -221,10 +224,46 @@ class APIMApiErrorRateWidget extends Widget {
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
-        console.log(data)
+
         if (data.length !== 0) {
-            this.setState({ weekCount: data.length < 10 ? ('0' + data.length) : data.length });
+            this.setState({ weekCount: data });
         }
+        this.analyzeerrorrate();
+    }
+
+    //analyze the errors received
+    analyzeerrorrate(){
+        const { totalCount, weekCount} = this.state;
+        const sorteddata = [];
+        let totalhits = 0;
+        let totalerrors = 0;
+        let errorpercentage = 0;
+
+        console.log(errorpercentage);
+
+       weekCount.forEach(element => {
+           totalhits += element[1];
+       });
+
+       totalCount.forEach(element => {
+           totalerrors += element[1]
+       });
+
+       errorpercentage = ((totalerrors/totalhits)*100).toPrecision(3);
+
+        weekCount.forEach((dataUnit) => {
+            for (let err = 0; err < totalCount.length; err++) {
+                if (dataUnit[0]===totalCount[err][0]) {
+                    let percentage = (totalCount[err][1]/dataUnit[1])*100;
+                       sorteddata.push({
+                        x: totalCount[err][0] + ' ' + percentage.toPrecision(3), y: percentage,
+                    },);
+                }             
+            }
+        });
+
+        this.setState({ sorteddata, errorpercentage });
+            //console.log(sorteddata, errorpercentage);
     }
 
     handleChange(event) {
@@ -248,14 +287,15 @@ class APIMApiErrorRateWidget extends Widget {
     
     render() {
         const {
-            localeMessages, faultyProviderConf, totalCount, weekCount,
+            localeMessages, faultyProviderConf, totalCount, weekCount, sorteddata, errorpercentage
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
         } = this.styles;
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
-        const apitestProps = { themeName, totalCount, weekCount };
+        const apitestProps = { themeName, totalCount, weekCount, sorteddata, errorpercentage };
+        console.log(sorteddata);
         
         if (!localeMessages) {
             return (
