@@ -221,7 +221,7 @@ class APIMApiErrorRateWidget extends Widget {
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
-
+        console.log(data)
         if (data.length !== 0) {
             this.setState({ weekCount: data.length < 10 ? ('0' + data.length) : data.length });
         }

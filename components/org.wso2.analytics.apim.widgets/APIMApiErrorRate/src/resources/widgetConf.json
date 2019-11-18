@@ -8,14 +8,19 @@
     },
     "providerConfig" : {
       "configs" : {
-        "type" : "SiddhiStoreDataProvider",
+        "type" : "RDBMSStreamingDataProvider",
         "config" : {
-          "siddhiApp": "@App:name('APIMErrorRate') define stream Request (meta_clientType string, applicationConsumerKey string, applicationName string, applicationId string, applicationOwner string, apiContext string, apiName string, apiVersion string, apiResourcePath string, apiResourceTemplate string, apiMethod string, apiCreator string, apiCreatorTenantDomain string, apiTier string, apiHostname string, username string, userTenantDomain string, userIp string, userAgent string, requestTimestamp long, throttledOut bool, responseTime long, serviceTime long, backendTime long, responseCacheHit bool, responseSize long, protocol string, responseCode int, destination string, securityLatency long, throttlingLatency long, requestMedLat long, responseMedLat long, backendLatency long, otherLatency long, gatewayType string, label string); @store(type = 'rdbms', datasource = 'APIM_ANALYTICS_DB') @purge(enable='true', interval='60 min', @retentionPeriod(sec='1 day', min='72 hours', hours='90 days', days='1 year', months='2 years', years='3 years')) define aggregation ApiUserPerAppAgg from Request select apiName, apiVersion, apiContext, apiCreator, apiCreatorTenantDomain, apiHostname, applicationId, responseCode, applicationName, applicationOwner, username, userTenantDomain, count() as totalRequestCount, gatewayType, label,'default' as regionalID group by apiContext,apiHostname, applicationId, responseCode, username, userTenantDomain aggregate by requestTimestamp every seconds...years;",
+          "datasourceName": "APIM_ANALYTICS_DB",
           "queryData" : {
-            "totalQuery": "from ApiUserPerAppAgg within {{from}}L, {{to}}L per \"{{per}}s\" select apiName,responseCode,sum(AGG_COUNT) as RequestCount group by responseCode order by RequestCount desc limit 5;",
-            "weekQuery": "from ApiUserPerAppAgg within {{from}}L, {{to}}L per \"{{per}}s\" select apiName,apiVersion,apiCreator,sum(totalRequestCount) as RequestCount group by apiName,apiCreator,apiVersion order by RequestCount desc limit 5;"
+            "totalQuery": "select apiName, SUM(AGG_COUNT) as count from ApiResPathPerApp_HOURS WHERE responseCode > 399 and AGG_EVENT_TIMESTAMP between '{{from}}' and '{{to}}' group by apiName",
+            "weekQuery": "select apiName, SUM(AGG_COUNT) as count from ApiResPathPerApp_HOURS WHERE AGG_EVENT_TIMESTAMP between '{{from}}' and '{{to}}' group by apiName"
           },
-          "purgingInterval": 60
+          "tableName": "ApiUserPerAppAgg_HOURS",
+          "incrementalColumn": "AGG_COUNT",
+          "publishingLimit": 2147483647,
+          "purgingInterval": 6,
+          "purgingLimit": 6,
+          "isPurgingEnable": true
         }
       }
     },

@@ -109,7 +109,7 @@ export default function APIMApiErrorRate(props) {
                     paddingBottom: '30px'
                 }}
                 >
-                   Total Error Rate: 57 %
+                   Total Error Rate: 57. %
                 </h3>
             </div>
 
