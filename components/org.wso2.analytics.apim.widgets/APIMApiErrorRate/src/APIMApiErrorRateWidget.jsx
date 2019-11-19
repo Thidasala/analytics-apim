@@ -207,7 +207,7 @@ class APIMApiErrorRateWidget extends Widget {
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
+        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuer';
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
@@ -256,14 +256,14 @@ class APIMApiErrorRateWidget extends Widget {
                 if (dataUnit[0]===totalCount[err][0]) {
                     let percentage = (totalCount[err][1]/dataUnit[1])*100;
                        sorteddata.push({
-                        x: totalCount[err][0] + ' ' + percentage.toPrecision(3), y: percentage,
+                        x: totalCount[err][0] + ' ' + percentage.toPrecision(3) + '%', y: percentage,
                     },);
                 }             
             }
         });
 
         this.setState({ sorteddata, errorpercentage });
-            //console.log(sorteddata, errorpercentage);
+            console.log(sorteddata, errorpercentage);
     }
 
     handleChange(event) {

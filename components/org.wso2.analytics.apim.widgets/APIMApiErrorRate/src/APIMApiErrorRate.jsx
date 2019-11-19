@@ -28,6 +28,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import { VictoryPie, VictoryLabel } from 'victory';
+import { Scrollbars } from 'react-custom-scrollbars'
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
@@ -53,9 +54,8 @@ export default function APIMApiErrorRate(props) {
         },
         dataWrapper: {
             textAlign: 'center',
-            width: '100%',
-            height: '100%',
-            paddingTop: '5%',
+            width: 'auto',
+            height: 'auto',
         },
         weekCount: {
             margin: 0,
@@ -80,13 +80,14 @@ export default function APIMApiErrorRate(props) {
         },
     };
     return (
+      <Scrollbars>
         <div
             style={{
                 background: themeName === 'dark'
                     ? 'linear-gradient(to right, rgb(4, 31, 51) 0%, rgb(37, 113, 167) 46%, rgb(42, 71, 101) 100%'
                     : '#fff',
-                width: '95%',
-                height: '85%',
+                width: 'auto',
+                height: 'auto',
                 margin: '5% 5%',
             }}
         >
@@ -94,7 +95,7 @@ export default function APIMApiErrorRate(props) {
                 <h3
                     style={{
                         borderBottom: themeName === 'dark' ? '1.5px solid #fff' : '3px solid #2571a7',
-                        paddingBottom: '20px',
+                        paddingBottom: '5px',
                         margin: 'auto',
                         textAlign: 'center',
                         fontWeight: 'normal',
@@ -106,7 +107,6 @@ export default function APIMApiErrorRate(props) {
                 <h3
                 style={{
                     fontWeight: 'normal',
-                    paddingBottom: '30px'
                 }}
                 >
                    Total Error Rate: {errorpercentage} %
@@ -114,7 +114,7 @@ export default function APIMApiErrorRate(props) {
             </div>
 
             <div style={styles.dataWrapper}>
-            <svg viewBox="-100 0 500 500">
+            <svg viewBox="-100 0 500 300">
                 <VictoryPie
                 animate={{
                     duration: 2000,
@@ -128,15 +128,10 @@ export default function APIMApiErrorRate(props) {
                 colorScale="qualitative"
                 style={{ labels: { fontSize: 11, fill: "white" } }}
                 />
-                {/* <VictoryLabel
-                textAnchor="middle"
-                style={{ fontSize: 20 }}
-                x={150} y={200}
-                text="Errors: 57.4 %"
-                /> */}
             </svg>
             </div>
         </div>
+    </Scrollbars>
     );
 }
 
