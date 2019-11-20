@@ -28,6 +28,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import { VictoryPie, VictoryLabel } from 'victory';
+import { Scrollbars } from 'react-custom-scrollbars'
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
@@ -80,13 +81,14 @@ export default function APIMApiAlerts(props) {
         },
     };
     return (
+        <Scrollbars>
         <div
             style={{
                 background: themeName === 'dark'
                     ? 'linear-gradient(to right, rgb(4, 31, 51) 0%, rgb(37, 113, 167) 46%, rgb(42, 71, 101) 100%'
                     : '#fff',
-                width: '95%',
-                height: '85%',
+                width: 'auto',
+                height: 'auto',
                 margin: '5% 5%',
             }}
         >
@@ -114,7 +116,7 @@ export default function APIMApiAlerts(props) {
             </div>
 
             <div style={styles.dataWrapper}>
-            <svg viewBox="-100 0 500 500">
+            <svg viewBox="-100 0 500 300">
                 <VictoryPie
                 standalone={false}
                 width={290} height={290}
@@ -126,7 +128,8 @@ export default function APIMApiAlerts(props) {
             </svg>
             </div>
         </div>
-    );
+        </Scrollbars>    
+        );
 }
 
 APIMApiAlerts.propTypes = {

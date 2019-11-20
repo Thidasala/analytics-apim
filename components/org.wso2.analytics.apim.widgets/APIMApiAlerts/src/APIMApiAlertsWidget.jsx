@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable valid-jsdoc */
-
+/* eslint-disable require-jsdoc */
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -52,6 +52,7 @@ const lightTheme = createMuiTheme({
     },
 });
 
+const queryParamKey = 'apimapialerts'
 
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
@@ -63,15 +64,6 @@ class APIMApiAlertsWidget extends Widget {
     constructor(props) {
         super(props);
 
-        this.state = {
-            width: this.props.width,
-            height: this.props.height,
-            totalCount: 0,
-            weekCount: 0,
-            localeMessages: null,
-            refreshInterval: 60000, // 1min
-        };
-
         this.styles = {
             loadingIcon: {
                 margin: 'auto',
@@ -79,7 +71,7 @@ class APIMApiAlertsWidget extends Widget {
             },
             paper: {
                 padding: '5%',
-                border: '10px solid #4555BB',
+                border: '2px solid #4555BB',
             },
             paperWrapper: {
                 margin: 'auto',
@@ -94,6 +86,17 @@ class APIMApiAlertsWidget extends Widget {
             },
         };
 
+        this.state = {
+            width: this.props.width,
+            height: this.props.height,
+            totalCount: null,
+            weekCount: null,
+            localeMessages: null,
+            sorteddata: null,
+            errorpercentage: null,
+            // refreshInterval: 60000, // 1min
+        };
+
         // This will re-size the widget when the glContainer's width is changed.
         if (this.props.glContainer !== undefined) {
             this.props.glContainer.on('resize', () => this.setState({
@@ -101,31 +104,34 @@ class APIMApiAlertsWidget extends Widget {
                 height: this.props.glContainer.height,
             }));
         }
-
+        this.handleChange = this.handleChange.bind(this);
+        this.apiErrorHandleChange = this.apiErrorHandleChange.bind(this);
         this.assembleweekQuery = this.assembleweekQuery.bind(this);
         this.assembletotalQuery = this.assembletotalQuery.bind(this);
         this.handleWeekCountReceived = this.handleWeekCountReceived.bind(this);
         this.handleTotalCountReceived = this.handleTotalCountReceived.bind(this);
+        this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
+        this.analyzeerrorrate = this.analyzeerrorrate.bind(this);
     }
 
     componentDidMount() {
         const { widgetID, id } = this.props;
-        const { refreshInterval } = this.state;
+        //const { refreshInterval } = this.state;
         const locale = languageWithoutRegionCode || language;
         this.loadLocale(locale);
 
         super.getWidgetConfiguration(widgetID)
             .then((message) => {
                 // set an interval to periodically retrieve data
-                const refresh = () => {
-                    super.getWidgetChannelManager().unsubscribeWidget(id);
-                    this.assembletotalQuery();
-                };
-                setInterval(refresh, refreshInterval);
+                // const refresh = () => {
+                //     super.getWidgetChannelManager().unsubscribeWidget(id);
+                //     this.assembletotalQuery();
+                // };
+                // setInterval(refresh, refreshInterval);
                 this.setState({
                     providerConfig: message.data.configs.providerConfig,
-                }, this.assembletotalQuery);
+                }, () => super.subscribe(this.handlePublisherParameters));
             })
             .catch((error) => {
                 console.error("Error occurred when loading widget '" + widgetID + "'. " + error);
@@ -134,13 +140,24 @@ class APIMApiAlertsWidget extends Widget {
                 });
             });
     }
+   
+    //Set the date time range
+    handlePublisherParameters(receivedMsg) {
+       // console.log(receivedMsg.from, receivedMsg.to, receivedMsg.granularity);
+        this.setState({
+            timeFrom: receivedMsg.from,
+            timeTo: receivedMsg.to,
+            perValue: receivedMsg.granularity,
+        },  this.assembletotalQuery);
+    }
+
 
     componentWillUnmount() {
         const { id } = this.props;
         super.getWidgetChannelManager().unsubscribeWidget(id);
     }
 
-    /**
+    /** 
      * Load locale file.
      * @memberof APIMApiAlertsWidget
      */
@@ -151,33 +168,36 @@ class APIMApiAlertsWidget extends Widget {
             })
             .catch(error => console.error(error));
     }
-
-    /**
-     * Formats the siddhi query
-     * @memberof APIMApiAlertsWidget
-     * */
+ 
+    //format the siddhi query to get total errors
     assembletotalQuery() {
-        const { providerConfig } = this.state;
+        //console.log(perValue, timeFrom, timeTo);
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
         dataProviderConfigs.configs.config.queryData.queryName = 'totalQuery';
+        dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+          //  '{{per}}': perValue
+        };
+        console.log("hello")
+        console.log(timeFrom, timeTo);
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
     }
 
-    /**
-     * Formats data received from assembletotalQuery
-     * @param {object} message - data retrieved
-     * @memberof APIMApiAlertsWidget
-     * */
+    // format the total error count received
     handleTotalCountReceived(message) {
         const { data } = message;
+        console.log(data);
         const { id } = this.props;
 
-        if (data.length !== 0) {
-            this.setState({ totalCount:  data.length < 10 ? ('0' + data.length) : data.length });
-        }
+        //if (data.length !== 0) {
+            this.setState({ totalCount:  data });
+        //}
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleweekQuery();
     }
@@ -187,16 +207,18 @@ class APIMApiAlertsWidget extends Widget {
      * @memberof APIMApiAlertsWidget
      * */
     assembleweekQuery() {
-        const { providerConfig } = this.state;
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
-        const weekStart = Moment().subtract(7, 'days');
 
         const dataProviderConfigs = cloneDeep(providerConfig);
         dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
         dataProviderConfigs.configs.config.queryData.queryValues = {
-            '{{weekStart}}': Moment(weekStart).format('YYYY-MM-DD HH:mm:ss'),
-            '{{weekEnd}}': Moment().format('YYYY-MM-DD HH:mm:ss')
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+           // '{{per}}': perValue
         };
+        console.log(timeFrom, timeTo);
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
     }
@@ -208,28 +230,83 @@ class APIMApiAlertsWidget extends Widget {
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
+        const { id } = this.props;
+        console.log("helloo");
 
-        if (data.length !== 0) {
-            this.setState({ weekCount: data.length < 10 ? ('0' + data.length) : data.length });
-        }
+        //if (data.length !== 0) {
+            this.setState({ weekCount: data });
+        //}
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.analyzeerrorrate();
     }
 
-    /**
-     * @inheritDoc
-     * @returns {ReactElement} Render the APIM Api Alerts widget
-     * @memberof APIMApiAlertsWidget
-     */
+    //analyze the errors received
+    analyzeerrorrate(){
+        const { totalCount, weekCount} = this.state;
+        console.log(totalCount, weekCount);
+        const sorteddata = [];
+        let totalhits = 0;
+        let totalerrors = 0;
+        let errorpercentage = 0;
+
+       // console.log(errorpercentage);
+
+       weekCount.forEach(element => {
+           totalhits += element[1];
+       });
+
+       totalCount.forEach(element => {
+           totalerrors += element[1]
+       });
+
+       errorpercentage = ((totalerrors/totalhits)*100).toPrecision(3);
+
+        weekCount.forEach((dataUnit) => {
+            for (let err = 0; err < totalCount.length; err++) {
+                if (dataUnit[0]===totalCount[err][0]) {
+                    let percentage = (totalCount[err][1]/dataUnit[1])*100;
+                       sorteddata.push({
+                        x: totalCount[err][0] + ' ' + percentage.toPrecision(3) + '%', y: percentage,
+                    },);
+                }             
+            }
+        });
+        
+        this.setState({ sorteddata, errorpercentage });
+          //  console.log(sorteddata, errorpercentage);
+    } 
+
+    handleChange(event) {
+        const { id } = this.props;
+
+        this.setQueryParam(event.target.value);
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assembletotalQuery();
+    }
+
+    apiErrorHandleChange(event) {
+        // const { limit } = this.state;
+         const { id } = this.props;
+ 
+         this.setQueryParam(event.target.value);
+         super.getWidgetChannelManager().unsubscribeWidget(id);
+         this.assembletotalQuery();
+     }
+
+
+    
     render() {
         const {
-            localeMessages, faultyProviderConf, totalCount, weekCount,
+            localeMessages, faultyProviderConf, totalCount, weekCount, sorteddata, errorpercentage
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
         } = this.styles;
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
-        const apitestProps = { themeName, totalCount, weekCount };
-
+        const apitestProps = { themeName, totalCount, weekCount, sorteddata, errorpercentage };
+       // console.log(sorteddata);
+        
         if (!localeMessages) {
             return (
                 <div style={inProgress}>
