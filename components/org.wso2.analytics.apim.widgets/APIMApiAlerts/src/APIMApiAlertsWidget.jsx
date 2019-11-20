@@ -192,7 +192,7 @@ class APIMApiAlertsWidget extends Widget {
     // format the total error count received
     handleTotalCountReceived(message) {
         const { data } = message;
-        console.log(data);
+        console.log("ffffffff");
         const { id } = this.props;
 
         //if (data.length !== 0) {
@@ -249,7 +249,7 @@ class APIMApiAlertsWidget extends Widget {
         let totalerrors = 0;
         let errorpercentage = 0;
 
-       // console.log(errorpercentage);
+       //console.log(errorpercentage);
 
        weekCount.forEach(element => {
            totalhits += element[1];

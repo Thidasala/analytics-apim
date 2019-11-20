@@ -64,17 +64,6 @@ class APIMApiErrorRateWidget extends Widget {
     constructor(props) {
         super(props);
 
-        this.state = {
-            width: this.props.width,
-            height: this.props.height,
-            totalCount: null,
-            weekCount: null,
-            localeMessages: null,
-            sorteddata: null,
-            errorpercentage: null,
-            // refreshInterval: 60000, // 1min
-        };
-
         this.styles = {
             loadingIcon: {
                 margin: 'auto',
@@ -95,6 +84,17 @@ class APIMApiErrorRateWidget extends Widget {
                 justifyContent: 'center',
                 height: this.props.height,
             },
+        };
+
+        this.state = {
+            width: this.props.width,
+            height: this.props.height,
+            totalCount: null,
+            weekCount: null,
+            localeMessages: null,
+            sorteddata: null,
+            errorpercentage: null,
+            // refreshInterval: 60000, // 1min
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -123,7 +123,7 @@ class APIMApiErrorRateWidget extends Widget {
 
         super.getWidgetConfiguration(widgetID)
             .then((message) => {
-                // // set an interval to periodically retrieve data
+                // set an interval to periodically retrieve data
                 // const refresh = () => {
                 //     super.getWidgetChannelManager().unsubscribeWidget(id);
                 //     this.assembletotalQuery();
@@ -143,6 +143,7 @@ class APIMApiErrorRateWidget extends Widget {
    
     //Set the date time range
     handlePublisherParameters(receivedMsg) {
+       // console.log(receivedMsg.from, receivedMsg.to, receivedMsg.granularity);
         this.setState({
             timeFrom: receivedMsg.from,
             timeTo: receivedMsg.to,
@@ -167,9 +168,10 @@ class APIMApiErrorRateWidget extends Widget {
             })
             .catch(error => console.error(error));
     }
-
-    //format the siddhi query
+ 
+    //format the siddhi query to get total errors
     assembletotalQuery() {
+        //console.log(perValue, timeFrom, timeTo);
         const queryParam = super.getGlobalState(queryParamKey);
         const { timeFrom, timeTo, perValue, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
@@ -181,6 +183,7 @@ class APIMApiErrorRateWidget extends Widget {
             '{{to}}': timeTo,
           //  '{{per}}': perValue
         };
+        console.log(timeFrom, timeTo);
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
     }
@@ -188,11 +191,12 @@ class APIMApiErrorRateWidget extends Widget {
     // format the total error count received
     handleTotalCountReceived(message) {
         const { data } = message;
+        console.log(data);
         const { id } = this.props;
 
-        if (data.length !== 0) {
+        //if (data.length !== 0) {
             this.setState({ totalCount:  data });
-        }
+        //}
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assembleweekQuery();
     }
@@ -207,12 +211,13 @@ class APIMApiErrorRateWidget extends Widget {
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuer';
+        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
            // '{{per}}': perValue
         };
+        console.log(timeFrom, timeTo);
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
     }
@@ -224,22 +229,26 @@ class APIMApiErrorRateWidget extends Widget {
      * */
     handleWeekCountReceived(message) {
         const { data } = message;
+        const { id } = this.props;
+        console.log(data);
 
-        if (data.length !== 0) {
+        //if (data.length !== 0) {
             this.setState({ weekCount: data });
-        }
+        //}
+        super.getWidgetChannelManager().unsubscribeWidget(id);
         this.analyzeerrorrate();
     }
 
     //analyze the errors received
     analyzeerrorrate(){
         const { totalCount, weekCount} = this.state;
+        console.log(totalCount, weekCount);
         const sorteddata = [];
         let totalhits = 0;
         let totalerrors = 0;
         let errorpercentage = 0;
 
-        console.log(errorpercentage);
+       // console.log(errorpercentage);
 
        weekCount.forEach(element => {
            totalhits += element[1];
@@ -261,10 +270,10 @@ class APIMApiErrorRateWidget extends Widget {
                 }             
             }
         });
-
+        
         this.setState({ sorteddata, errorpercentage });
-            console.log(sorteddata, errorpercentage);
-    }
+          //  console.log(sorteddata, errorpercentage);
+    } 
 
     handleChange(event) {
         const { id } = this.props;
@@ -295,7 +304,7 @@ class APIMApiErrorRateWidget extends Widget {
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
         const apitestProps = { themeName, totalCount, weekCount, sorteddata, errorpercentage };
-        console.log(sorteddata);
+       // console.log(sorteddata);
         
         if (!localeMessages) {
             return (

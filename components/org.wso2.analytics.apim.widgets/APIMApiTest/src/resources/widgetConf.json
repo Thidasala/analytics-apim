@@ -2,7 +2,7 @@
   "name" : "APIM Api Test",
   "id" : "APIMApiTest",
   "thumbnailURL" : "",
-  "configs" : {
+  "configs" : { 
     "pubsub" : {
       "types" : ["subscriber"]
     },
@@ -15,7 +15,7 @@
             "totalQuery": "select SUM(AGG_COUNT) as count from ApiUserPerAppAgg_HOURS group by apiName",
             "weekQuery" : "select COUNT(AGG_COUNT) as count from ApiUserPerAppAgg_MINUTES where AGG_EVENT_TIMESTAMP between '{{weekStart}}' and '{{weekEnd}}' group by apiName"
           },
-          "tableName": "ApiUserPerAppAgg_HOURS",
+          "tableName": "ApiResPathPerApp_HOURS",
           "incrementalColumn": "AGG_COUNT",
           "publishingLimit": 2147483647,
           "purgingInterval": 6,

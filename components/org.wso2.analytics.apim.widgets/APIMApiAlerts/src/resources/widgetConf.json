@@ -12,11 +12,11 @@
         "config" : {
           "datasourceName": "APIM_ANALYTICS_DB",
           "queryData" : {
-            "totalQuery": "select apiName, COUNT(apiName) as count from ApimAbnormalReqAlert WHERE alertTimestamp between '{{from}}' and '{{to}}' group by apiName",
-            "weekQuery": "select apiName, COUNT(apiName) as count from ApimAbnormalReqAlert WHERE alertTimestamp between '{{from}}' and '{{to}}' group by apiName"
+            "totalQuery": "select apiName, SUM(AGG_COUNT) as count from ApiResPathPerApp_HOURS WHERE responseCode > 399 and AGG_EVENT_TIMESTAMP between '{{from}}' and '{{to}}' group by apiName",
+            "weekQuery": "select apiName, SUM(AGG_COUNT) as count from ApiResPathPerApp_HOURS WHERE AGG_EVENT_TIMESTAMP between '{{from}}' and '{{to}}' group by apiName"
           },
-          "tableName": "ApimAbnormalReqAlert",
-          "incrementalColumn": "apiName",
+          "tableName": "ApiUserPerAppAgg_HOURS",
+          "incrementalColumn": "AGG_COUNT",
           "publishingLimit": 2147483647,
           "purgingInterval": 6,
           "purgingLimit": 6,

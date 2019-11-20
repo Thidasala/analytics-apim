@@ -28,7 +28,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import { VictoryPie, VictoryLabel } from 'victory';
-import { Scrollbars } from 'react-custom-scrollbars'
+import { Scrollbars } from 'react-custom-scrollbars';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
@@ -64,6 +66,17 @@ export default function APIMApiErrorRate(props) {
             letterSpacing: 1,
             fontSize: '80%',
         },
+        paperWrapper: {
+            height: '75%',
+        },
+        paper: {
+            background: '#969696',
+            width: '75%',
+            padding: '4%',
+            border: '1.5px solid #fff',
+            margin: 'auto',
+            marginTop: '5%',
+        },
         typeText: {
             textAlign: 'left',
             fontWeight: 'normal',
@@ -79,7 +92,27 @@ export default function APIMApiErrorRate(props) {
             right: '8%',
         },
     };
-    return (
+    if (isNaN(errorpercentage)) {
+        return (
+            <div style={styles.paperWrapper}>
+                <Paper
+                    elevation={1}
+                    style={styles.paper}
+                >
+                    <Typography variant='h5' component='h3'>
+                        <FormattedMessage id='nodata.error.heading' defaultMessage='No Data Available !' />
+                    </Typography>
+                    <Typography component='p'>
+                        <FormattedMessage
+                            id='nodata.error.body'
+                            defaultMessage='No data available for the selected options.'
+                        />
+                    </Typography>
+                </Paper>
+            </div>
+        );
+    }
+    return (  
       <Scrollbars>
         <div
             style={{
@@ -109,7 +142,7 @@ export default function APIMApiErrorRate(props) {
                     fontWeight: 'normal',
                 }}
                 >
-                   Total Error Rate: {errorpercentage} %
+                   Total Error Rat: {errorpercentage} %
                 </h3>
             </div>
 
