@@ -183,8 +183,6 @@ class APIMApiAlertsWidget extends Widget {
             '{{to}}': timeTo,
           //  '{{per}}': perValue
         };
-        console.log("hello")
-        console.log(timeFrom, timeTo);
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
     }
@@ -192,14 +190,14 @@ class APIMApiAlertsWidget extends Widget {
     // format the total error count received
     handleTotalCountReceived(message) {
         const { data } = message;
-        console.log("ffffffff");
         const { id } = this.props;
 
         //if (data.length !== 0) {
             this.setState({ totalCount:  data });
+            console.log(data);
         //}
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assembleweekQuery();
+        // super.getWidgetChannelManager().unsubscribeWidget(id);
+        // this.assembleweekQuery();
     }
 
     /**
@@ -231,7 +229,7 @@ class APIMApiAlertsWidget extends Widget {
     handleWeekCountReceived(message) {
         const { data } = message;
         const { id } = this.props;
-        console.log("helloo");
+        //console.log("helloo");
 
         //if (data.length !== 0) {
             this.setState({ weekCount: data });
@@ -243,7 +241,7 @@ class APIMApiAlertsWidget extends Widget {
     //analyze the errors received
     analyzeerrorrate(){
         const { totalCount, weekCount} = this.state;
-        console.log(totalCount, weekCount);
+       // console.log(totalCount, weekCount);
         const sorteddata = [];
         let totalhits = 0;
         let totalerrors = 0;
@@ -324,7 +322,7 @@ class APIMApiAlertsWidget extends Widget {
                                     <Typography variant='h4' component='h3'>
                                         <FormattedMessage
                                             id='config.error.heading'
-                                            defaultMessage='Configuration Error !'
+                                            defaultMessage='Configuration Erro !'
                                         />
                                     </Typography>
                                     <Typography component='p'>
