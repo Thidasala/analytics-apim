@@ -12,15 +12,14 @@
         "config" : {
           "datasourceName": "APIM_ANALYTICS_DB",
           "queryData" : {
-            "totalQuery": "select COUNT(AGG_COUNT) as count from ApiUserPerAppAgg_MINUTES group by apiName",
-            "weekQuery" : "select COUNT(AGG_COUNT) as count from ApiUserPerAppAgg_MINUTES where AGG_EVENT_TIMESTAMP between '{{weekStart}}' and '{{weekEnd}}' group by apiName"
+            "latencyquery": "select apiName, MAX(AGG_SUM_backendLAtency) as latency from ApiExeTime_HOURS WHERE AGG_TIMESTAMP between '{{From}}' and '{{To}}' group by apiName"
           },
-          "tableName": "ApiUserPerAppAgg_MINUTES",
-          "incrementalColumn": "AGG_COUNT",
+          "tableName": "ApiExeTime_HOURS",
+          "incrementalColumn": "AGG_SUM_backendLAtency",
           "publishingLimit": 2147483647,
           "purgingInterval": 6,
           "purgingLimit": 6,
-          "isPurgingEnable": false
+          "isPurgingEnable": true
         }
       }
     },

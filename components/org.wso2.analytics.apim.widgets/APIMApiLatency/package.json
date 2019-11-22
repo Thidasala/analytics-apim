@@ -12,6 +12,7 @@
         "react": "^16.7.0",
         "react-intl": "^2.8.0",
         "react-vizgrammar": "^0.8.6",
+        "react-custom-scrollbars": "^4.2.1",
         "rimraf": "^2.6.3",
         "victory": "^33.1.2"
     },
