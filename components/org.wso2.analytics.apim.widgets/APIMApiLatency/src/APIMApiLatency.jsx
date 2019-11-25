@@ -79,7 +79,7 @@ export default function APIMApiLatency(props) {
             marginTop: 10,
         },
     };
-    if (latancyData == null) {
+    if (latancyData == null || latancyData.length === 0) {
         return (
             <div style={styles.paperWrapper}>
                 <Paper
@@ -139,6 +139,5 @@ APIMRecentApiTraffic.propTypes = {
     themeName: PropTypes.string.isRequired,
     height: PropTypes.string.isRequired,
     latancyData: PropTypes.instanceOf(Object).isRequired,
-    apiCreatedHandleChange: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,
 };

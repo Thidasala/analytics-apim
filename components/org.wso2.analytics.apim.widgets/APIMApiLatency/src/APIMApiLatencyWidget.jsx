@@ -26,7 +26,6 @@ import {
 } from 'react-intl';
 import Axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
-import Moment from 'moment';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
@@ -109,7 +108,6 @@ class APIMApiLatencyWidget extends Widget {
         this.loadLocale = this.loadLocale.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.apiCreatedHandleChange = this.apiCreatedHandleChange.bind(this);
     }
 
     componentDidMount() {
@@ -171,8 +169,6 @@ class APIMApiLatencyWidget extends Widget {
     //Format the data received from the query
     handleTotallatencyReceived(message) {
         const { data } = message;
-       // console.log(data);
-       // console.log(Date.now());
         const latancyData = [];
         
         if (data) {
@@ -195,21 +191,8 @@ class APIMApiLatencyWidget extends Widget {
         this.assemblelatencyQuery();
     }
 
-
-    apiCreatedHandleChange(event) {
-       // const { limit } = this.state;
-        const { id } = this.props;
-
-        this.setQueryParam(event.target.value);
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assemblelatencyQuery();
-    }
-
-  
-
     //Render the Apim Latency Widget
     render() {
-       // console.log(this.latancyData);
         const {
             localeMessages, faultyProviderConf, latancyData, height
         } = this.state;
@@ -229,7 +212,6 @@ class APIMApiLatencyWidget extends Widget {
                 </div>
             );
         }
-      //  console.log(latancyData);
         return (
             <IntlProvider locale={languageWithoutRegionCode} messages={localeMessages}>
                 <MuiThemeProvider theme={themeName === 'dark' ? darkTheme : lightTheme}>
@@ -254,7 +236,6 @@ class APIMApiLatencyWidget extends Widget {
                             </div>
                         ) : (
                             <APIMApiLatency {...apiLatancyProps}
-                            apiCreatedHandleChange={this.apiCreatedHandleChange}
                             handleChange={this.handleChange} 
                             />
                         )

@@ -5,22 +5,19 @@
   "configs" : {
     "pubsub" : {
       "types" : ["subscriber"]
-    },
+    }, 
     "providerConfig" : {
       "configs" : {
         "type" : "RDBMSStreamingDataProvider",
         "config" : {
           "datasourceName": "APIM_ANALYTICS_DB",
           "queryData" : {
-            "totalQuery": "select apiName, count(apiName) as counts from ApimAbnormalReqAlert WHERE alertTimestamp between '{{from}}' and '{{to}}' group by apiName",
-            "weekQuery": "select apiName, SUM(AGG_COUNT) as count from ApiResPathPerApp_HOURS WHERE AGG_EVENT_TIMESTAMP between '{{from}}' and '{{to}}' group by apiName"
+            "alert": "select apiName, count(apiName) as counts from {{tableName}} WHERE alertTimestamp between '{{from}}' and '{{to}}' group by apiName"
           },
-          "tableName": "ApimAbnormalReqAlert",
-          "incrementalColumn": "requestCountPerMin",
+          "tableName": "{{tableName}}",
+          "incrementalColumn": "{{incrementalColumn}}",
           "publishingLimit": 2147483647,
-          "purgingInterval": 6,
-          "purgingLimit": 6,
-          "isPurgingEnable": true
+          "isPurgingEnable": false
         }
       }
     },

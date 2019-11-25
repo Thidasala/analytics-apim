@@ -20,14 +20,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
-import { VictoryBar, VictoryChart, VictoryAxis,VictoryTheme } from 'victory';
+import { VictoryBar, VictoryChart, VictoryAxis } from 'victory';
 
 
 const styles = theme => ({
@@ -45,42 +40,6 @@ const styles = theme => ({
         margin: 'auto',
         display: 'block',
     },
-    paginationRoot: {
-        color: theme.palette.text.secondary,
-        fontSize: theme.typography.pxToRem(12),
-        '&:last-child': {
-            padding: 0,
-        },
-    },
-    paginationToolbar: {
-        height: 56,
-        minHeight: 56,
-        padding: '0 5%',
-    },
-    paginationCaption: {
-        flexShrink: 0,
-    },
-    paginationSelectRoot: {
-        marginRight: '10px',
-    },
-    paginationSelect: {
-        paddingLeft: 8,
-        paddingRight: 16,
-    },
-    paginationSelectIcon: {
-        top: 1,
-    },
-    paginationInput: {
-        color: 'inherit',
-        fontSize: 'inherit',
-        flexShrink: 0,
-    },
-    paginationMenuItem: {
-        backgroundColor: theme.palette.type === 'light' ? '#fff' : '#162638',
-    },
-    paginationActions: {
-        marginLeft: 0,
-    },
 });
 
 
@@ -91,7 +50,7 @@ const chartTheme = {
        tickLabels: {
          // this changed the color of my numbers to white
          fill: 'white',
-         fontSize: '8px',
+         fontSize: '6px',
          angle: 25,
        },
        grid: { stroke: 'none' },
@@ -103,21 +62,8 @@ const chartTheme = {
 // dataset for the chart
 const dataset = [];
 
-//set the data for the table
 
-function setdata(data)
-{
-data.forEach(e => {
-   dataset.push({"API": e.ApiName, "Traffic": e.maxLatency})
-//console.log(e);
-    console.log(dataset);
-    //dataset
-});
-}
-
-/**
- * Create React Component for Api Version Usage Summary Table
- */
+//React component for table data
 class CustomTable extends React.Component {
     /**
      * Creates an instance of CustomTable.
@@ -137,41 +83,7 @@ class CustomTable extends React.Component {
         };
     }
 
-    handleRequestSort = (event, property) => {
-        const { order, orderBy } = this.state;
-        let orderNew = 'desc';
-        if (orderBy === property && order === 'desc') {
-            orderNew = 'asc';
-        }
-        this.setState({ order: orderNew, orderBy: property });
-    };
-
-    handleChangePage = (event, page) => {
-        this.setState({ page });
-    };
-
-    handleChangeRowsPerPage = (event) => {
-        this.setState({ rowsPerPage: event.target.value });
-    };
-
-    handleExpandClick = () => {
-        this.setState(state => ({ expanded: !state.expanded }));
-    };
-
-    handleColumnSelect = (event) => {
-        this.setState({ filterColumn: event.target.value });
-    };
-
-    handleQueryChange = (event) => {
-        this.setState({ query: event.target.value });
-    };
-
-    /**
-     * Render the Api Version Usage Summary table
-     * @return {ReactElement} customTable
-     */
-
-    
+    //handle the latencydatatable
     render() {
         const { data, classes } = this.props;
 
@@ -214,7 +126,7 @@ class CustomTable extends React.Component {
                 />
                   <VictoryAxis
                     dependentAxis
-                    label='Total Traffic'
+                    label='Max Latency (ms)'
                     style={{
                     axisLabel: {
                       padding: 30,

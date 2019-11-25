@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable valid-jsdoc */
-/* eslint-disable require-jsdoc */
+
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -89,12 +87,10 @@ class APIMApiAlertsWidget extends Widget {
         this.state = {
             width: this.props.width,
             height: this.props.height,
-            totalCount: null,
-            weekCount: null,
             localeMessages: null,
-            sorteddata: null,
-            errorpercentage: null,
-            // refreshInterval: 60000, // 1min
+            backendalert: null,
+            responsealert: null,
+            reqalert: null,
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -105,30 +101,25 @@ class APIMApiAlertsWidget extends Widget {
             }));
         }
         this.handleChange = this.handleChange.bind(this);
-        this.apiErrorHandleChange = this.apiErrorHandleChange.bind(this);
-        this.assembleweekQuery = this.assembleweekQuery.bind(this);
-        this.assembletotalQuery = this.assembletotalQuery.bind(this);
-        this.handleWeekCountReceived = this.handleWeekCountReceived.bind(this);
-        this.handleTotalCountReceived = this.handleTotalCountReceived.bind(this);
+        this.assemblereqalertquery = this.assemblereqalertquery.bind(this);
+        this.assemblereqalertreceived = this.assemblereqalertreceived.bind(this);
+        this.assembleresponsealertquery = this.assembleresponsealertquery.bind(this);
+        this.assembleresponsealertreceived = this.assembleresponsealertreceived.bind(this);
+        this.assemblebackendalertquery = this.assemblebackendalertquery.bind(this);
+        this.assemblebackendalertreceived = this.assemblebackendalertreceived.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
-        this.analyzeerrorrate = this.analyzeerrorrate.bind(this);
     }
+
+
 
     componentDidMount() {
         const { widgetID, id } = this.props;
-        //const { refreshInterval } = this.state;
         const locale = languageWithoutRegionCode || language;
         this.loadLocale(locale);
 
         super.getWidgetConfiguration(widgetID)
             .then((message) => {
-                // set an interval to periodically retrieve data
-                // const refresh = () => {
-                //     super.getWidgetChannelManager().unsubscribeWidget(id);
-                //     this.assembletotalQuery();
-                // };
-                // setInterval(refresh, refreshInterval);
                 this.setState({
                     providerConfig: message.data.configs.providerConfig,
                 }, () => super.subscribe(this.handlePublisherParameters));
@@ -141,14 +132,14 @@ class APIMApiAlertsWidget extends Widget {
             });
     }
    
+
+
     //Set the date time range
     handlePublisherParameters(receivedMsg) {
-       // console.log(receivedMsg.from, receivedMsg.to, receivedMsg.granularity);
         this.setState({
             timeFrom: receivedMsg.from,
             timeTo: receivedMsg.to,
-            perValue: receivedMsg.granularity,
-        },  this.assembletotalQuery);
+        },  this.assemblereqalertquery);
     }
 
 
@@ -157,10 +148,8 @@ class APIMApiAlertsWidget extends Widget {
         super.getWidgetChannelManager().unsubscribeWidget(id);
     }
 
-    /** 
-     * Load locale file.
-     * @memberof APIMApiAlertsWidget
-     */
+    
+    //load the local file
     loadLocale(locale) {
         Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiAlerts/locales/${locale}.json`)
             .then((response) => {
@@ -169,140 +158,212 @@ class APIMApiAlertsWidget extends Widget {
             .catch(error => console.error(error));
     }
  
-    //format the siddhi query to get total errors
-    assembletotalQuery() {
-        //console.log(perValue, timeFrom, timeTo);
+
+    //format the siddhi query for abnormal request alert
+    assemblereqalertquery() {
         const queryParam = super.getGlobalState(queryParamKey);
-        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
+        const { timeFrom, timeTo, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'totalQuery';
+
+        dataProviderConfigs.configs.config.tableName = 'ApimAbnormalReqAlert';
+        dataProviderConfigs.configs.config.incrementalColumn = 'requestCountPerMin';
+        dataProviderConfigs.configs.config.queryData.queryName = 'alert';
         dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{tableName}}': 'ApimAbnormalReqAlert',
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-          //  '{{per}}': perValue
         };
-        super.getWidgetChannelManager()
-            .subscribeWidget(id, widgetName, this.handleTotalCountReceived, dataProviderConfigs);
-    }
-
-    // format the total error count received
-    handleTotalCountReceived(message) {
-        const { data } = message;
-        const { id } = this.props;
-
-        //if (data.length !== 0) {
-            this.setState({ totalCount:  data });
-            console.log(data);
-        //}
-        // super.getWidgetChannelManager().unsubscribeWidget(id);
-        // this.assembleweekQuery();
-    }
-
-    /**
-     * Formats the siddhi query using selected options
-     * @memberof APIMApiAlertsWidget
-     * */
-    assembleweekQuery() {
-        const queryParam = super.getGlobalState(queryParamKey);
-        const { timeFrom, timeTo, perValue, providerConfig } = this.state;
-        const { id, widgetID: widgetName } = this.props;
-
-        const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'weekQuery';
-        dataProviderConfigs.configs.config.queryData.queryValues = {
-            '{{from}}': timeFrom,
-            '{{to}}': timeTo,
-           // '{{per}}': perValue
-        };
-        console.log(timeFrom, timeTo);
-        super.getWidgetChannelManager()
-            .subscribeWidget(id, widgetName, this.handleWeekCountReceived, dataProviderConfigs);
-    }
-
-    /**
-     * Formats data received from assembleweekQuery
-     * @param {object} message - data retrieved
-     * @memberof APIMApiAlertsWidget
-     * */
-    handleWeekCountReceived(message) {
-        const { data } = message;
-        const { id } = this.props;
-        //console.log("helloo");
-
-        //if (data.length !== 0) {
-            this.setState({ weekCount: data });
-        //}
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.analyzeerrorrate();
-    }
-
-    //analyze the errors received
-    analyzeerrorrate(){
-        const { totalCount, weekCount} = this.state;
-       // console.log(totalCount, weekCount);
-        const sorteddata = [];
-        let totalhits = 0;
-        let totalerrors = 0;
-        let errorpercentage = 0;
-
-       //console.log(errorpercentage);
-
-       weekCount.forEach(element => {
-           totalhits += element[1];
-       });
-
-       totalCount.forEach(element => {
-           totalerrors += element[1]
-       });
-
-       errorpercentage = ((totalerrors/totalhits)*100).toPrecision(3);
-
-        weekCount.forEach((dataUnit) => {
-            for (let err = 0; err < totalCount.length; err++) {
-                if (dataUnit[0]===totalCount[err][0]) {
-                    let percentage = (totalCount[err][1]/dataUnit[1])*100;
-                       sorteddata.push({
-                        x: totalCount[err][0] + ' ' + percentage.toPrecision(3) + '%', y: percentage,
-                    },);
-                }             
-            }
-        });
         
-        this.setState({ sorteddata, errorpercentage });
-          //  console.log(sorteddata, errorpercentage);
-    } 
+        super.getWidgetChannelManager()
+            .subscribeWidget(id, widgetName, this.assemblereqalertreceived, dataProviderConfigs);
+    }
+
+
+
+    // format the abnormal request alert received
+    assemblereqalertreceived(message) {
+        const { data } = message;
+        //console.log(data);
+        const { id } = this.props;
+
+        if (data.length !== 0) {
+            this.setState({ reqalert: data });
+        }
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assembleresponsealertquery();
+    }
+
+
+
+    //format siddhi query for abnormal response alerts
+    assembleresponsealertquery() {
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, providerConfig } = this.state;
+        const { id, widgetID: widgetName } = this.props;
+
+        const dataProviderConfigs = cloneDeep(providerConfig);
+
+        dataProviderConfigs.configs.config.tableName = 'ApimAbnormalResponseTimeAlert';
+        dataProviderConfigs.configs.config.incrementalColumn = 'responseTime';
+        dataProviderConfigs.configs.config.queryData.queryName = 'alert';
+        dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{tableName}}': 'ApimAbnormalResponseTimeAlert',
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+        };
+        
+        super.getWidgetChannelManager()
+            .subscribeWidget(id, widgetName, this.assembleresponsealertreceived, dataProviderConfigs);
+    }
+
+    //format the abnormal response time alert
+    assembleresponsealertreceived(message) {
+        const { data } = message;
+        //console.log(data);
+        const { id } = this.props;
+
+        if (data.length !== 0) {
+            this.setState({ responsealert:  data });
+            //console.log(data);
+        }
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assemblebackendalertquery();
+    }
+
+     //format siddhi query for abnormal backend time alerts
+     assemblebackendalertquery() {
+        const queryParam = super.getGlobalState(queryParamKey);
+        const { timeFrom, timeTo, providerConfig } = this.state;
+        const { id, widgetID: widgetName } = this.props;
+
+        const dataProviderConfigs = cloneDeep(providerConfig);
+
+        dataProviderConfigs.configs.config.tableName = 'ApimAbnormalBackendTimeAlert';
+        dataProviderConfigs.configs.config.incrementalColumn = 'backendTime';
+        dataProviderConfigs.configs.config.queryData.queryName = 'alert';
+        dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{tableName}}': 'ApimAbnormalBackendTimeAlert',
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+        };
+        
+        super.getWidgetChannelManager()
+            .subscribeWidget(id, widgetName, this.assemblebackendalertreceived, dataProviderConfigs);
+    }
+
+
+    //format abnormal backend time alerts
+    assemblebackendalertreceived(message) {
+        const { data } = message;
+        //console.log(data);
+        const { id } = this.props;
+
+        if (data.length !== 0) {
+            this.setState({ backendalert:  data });
+           // console.log(data);
+        }
+       super.getWidgetChannelManager().unsubscribeWidget(id);
+       this.analyzealertdata();
+    }
+
+
+    //analyze the total alert data receivs
+    analyzealertdata()
+    {
+        const{ backendalert, responsealert, reqalert } = this.state
+        console.log(backendalert, responsealert, reqalert);
+        let sortedarray = [];
+
+        if (backendalert != null) {
+            backendalert.forEach(dataunit => {
+                sortedarray.push({
+                    ApiName: dataunit[0], alerts: dataunit[1]})
+                
+            });
+        }
+       
+
+        if (responsealert != null) {
+            if (sortedarray == null) {
+                responsealert.forEach(dataunit => {
+                    sortedarray.push({
+                        ApiName: dataunit[0], alerts: dataunit[1]})
+                    
+                });
+            }
+            else {
+                responsealert.forEach(resarrsy => {
+                       sortedarray.forEach(saray=> {
+                            if (saray.ApiName==resarrsy[0]) {
+                                saray.alerts += resarrsy[1]
+                            }else{
+                                sortedarray.push({
+                                    ApiName: resarrsy[0], alerts: resarrsy[1]})
+                            }
+                    
+                       });      
+                });
+            }
+            
+        }
+
+       
+
+        if (reqalert != null) {
+            if (sortedarray == null) {
+                reqalert.forEach(dataunit => {
+                    sortedarray.push({
+                        ApiName: dataunit[0], alerts: dataunit[1]})
+                    
+                });
+            }
+            else {
+                reqalert.forEach(resarrsy => {
+                    console.log(resarrsy[0]);
+                       sortedarray.forEach(saray=> {
+                           console.log(saray.ApiName);
+                            // if (saray.ApiName==resarrsy[0]) {
+                            //     saray.alerts += resarrsy[1]
+                            // }else{
+                            //     sortedarray.push({
+                            //         ApiName: resarrsy[0], alerts: resarrsy[1]})
+                            // }
+                    
+                       });      
+                });
+            }
+            
+        }
+
+        console.log(sortedarray);
+        
+    }
+
+
+
+
 
     handleChange(event) {
         const { id } = this.props;
 
         this.setQueryParam(event.target.value);
         super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assembletotalQuery();
+        this.assemblealertQuery();
     }
-
-    apiErrorHandleChange(event) {
-        // const { limit } = this.state;
-         const { id } = this.props;
- 
-         this.setQueryParam(event.target.value);
-         super.getWidgetChannelManager().unsubscribeWidget(id);
-         this.assembletotalQuery();
-     }
-
 
     
     render() {
         const {
-            localeMessages, faultyProviderConf, totalCount, weekCount, sorteddata, errorpercentage
+            localeMessages, faultyProviderConf,
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
         } = this.styles;
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
-        const apitestProps = { themeName, totalCount, weekCount, sorteddata, errorpercentage };
+        const apialertProps = { themeName };
        // console.log(sorteddata);
         
         if (!localeMessages) {
@@ -335,7 +396,7 @@ class APIMApiAlertsWidget extends Widget {
                                 </Paper>
                             </div>
                         ) : (
-                            <APIMApiAlerts {...apitestProps} />
+                            <APIMApiAlerts {...apialertProps} />
                         )
                     }
                 </MuiThemeProvider>

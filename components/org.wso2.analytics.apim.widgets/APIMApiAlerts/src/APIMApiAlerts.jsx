@@ -111,7 +111,7 @@ export default function APIMApiAlerts(props) {
                     paddingBottom: '30px'
                 }}
                 >
-                   Total Alrts : 108
+                   Total Alrts : 10
                 </h3>
             </div>
 
