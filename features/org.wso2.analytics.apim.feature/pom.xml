@@ -30,6 +30,11 @@
         <!-- Widgets-->
         <dependency>
             <groupId>org.wso2.analytics.apim</groupId>
+            <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.details</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.analytics.apim</groupId>
             <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
             <type>zip</type>
         </dependency>
@@ -243,7 +248,16 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                            <artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wso2.analytics.apim</groupId>
+                                    <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.details</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/target/widgets/</outputDirectory>
+                                    <includes>APIMRecentApiDetails/**</includes>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.wso2.analytics.apim</groupId>
                                     <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
                                     <version>${project.version}</version>
