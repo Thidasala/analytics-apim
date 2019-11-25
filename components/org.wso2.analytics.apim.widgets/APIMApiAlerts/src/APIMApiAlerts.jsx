@@ -28,7 +28,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import PlayCircleFilled from '@material-ui/icons/PlayCircleFilled';
 import { VictoryPie, VictoryLabel } from 'victory';
-import { Scrollbars } from 'react-custom-scrollbars'
+import { Scrollbars } from 'react-custom-scrollbars';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 /**
  * React Component for APIM Api Created widget body
  * @param {any} props @inheritDoc
@@ -36,15 +38,7 @@ import { Scrollbars } from 'react-custom-scrollbars'
  */
 export default function APIMApiAlerts(props) {
 
-
-    const dataset = [
-        { x: 'API1 (10)', y: 10 },
-        { x: 'API2 (70)', y: 70 },
-        { x: 'API3 (50)', y: 50 },
-        { x: 'API4 (20)', y: 20 }
-    ];
-
-    const { themeName, totalCount, weekCount } = props;
+    const { themeName, finaldataset, totalcount } = props;
     const styles = {
         headingWrapper: {
             height: '5%',
@@ -54,9 +48,8 @@ export default function APIMApiAlerts(props) {
         },
         dataWrapper: {
             textAlign: 'center',
-            width: '100%',
-            height: '100%',
-            paddingTop: '5%',
+            width: 'auto',
+            height: 'auto',
         },
         weekCount: {
             margin: 0,
@@ -64,6 +57,17 @@ export default function APIMApiAlerts(props) {
             color: 'rgb(135,205,223)',
             letterSpacing: 1,
             fontSize: '80%',
+        },
+        paperWrapper: {
+            height: '75%',
+        },
+        paper: {
+            background: '#969696',
+            width: '75%',
+            padding: '4%',
+            border: '1.5px solid #fff',
+            margin: 'auto',
+            marginTop: '5%',
         },
         typeText: {
             textAlign: 'left',
@@ -80,6 +84,26 @@ export default function APIMApiAlerts(props) {
             right: '8%',
         },
     };
+    if (totalcount == null) {
+        return (
+            <div style={styles.paperWrapper}>
+                <Paper
+                    elevation={1}
+                    style={styles.paper}
+                >
+                    <Typography variant='h5' component='h3'>
+                        <FormattedMessage id='nodata.error.heading' defaultMessage='No Data Available !' />
+                    </Typography>
+                    <Typography component='p'>
+                        <FormattedMessage
+                            id='nodata.error.body'
+                            defaultMessage='No data available for the selected options.'
+                        />
+                    </Typography>
+                </Paper>
+            </div>
+        );
+    }
     return (
         <Scrollbars>
         <div
@@ -96,10 +120,10 @@ export default function APIMApiAlerts(props) {
                 <h3
                     style={{
                         borderBottom: themeName === 'dark' ? '1.5px solid #fff' : '3px solid #2571a7',
-                        paddingBottom: '20px',
+                        paddingBottom: '5px',
                         margin: 'auto',
                         textAlign: 'center',
-                        fontWeight: 'bold',
+                        fontWeight: 'normal',
                         letterSpacing: 1.5,
                     }}
                 >
@@ -108,19 +132,24 @@ export default function APIMApiAlerts(props) {
                 <h3
                 style={{
                     fontWeight: 'normal',
-                    paddingBottom: '30px'
+                    paddingBottom: '5px'
                 }}
                 >
-                   Total Alrts : 10
+                   Total Alrts : {totalcount}
                 </h3>
             </div>
 
             <div style={styles.dataWrapper}>
             <svg viewBox="-100 0 500 300">
                 <VictoryPie
+                animate={{
+                    duration: 2000,
+                    onLoad: { duration: 1000 }
+                    }}
                 standalone={false}
                 width={290} height={290}
-                data={dataset}
+                data={finaldataset}
+
                 innerRadius={0} labelRadius={0}
                 colorScale="qualitative"
                 style={{ labels: { fontSize: 11, fill: "white" } }}
@@ -134,6 +163,6 @@ export default function APIMApiAlerts(props) {
 
 APIMApiAlerts.propTypes = {
     themeName: PropTypes.string.isRequired,
-    totalCount: PropTypes.string.isRequired,
-    weekCount: PropTypes.string.isRequired,
+    sortedarray: PropTypes.string.isRequired,
+    totalcount: PropTypes.string.isRequired,
 };

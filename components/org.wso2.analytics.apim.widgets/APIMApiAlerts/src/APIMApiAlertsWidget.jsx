@@ -91,6 +91,10 @@ class APIMApiAlertsWidget extends Widget {
             backendalert: null,
             responsealert: null,
             reqalert: null,
+            sortedarray: null,
+            finaldataset: null,
+            totalcount : null
+
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -109,6 +113,7 @@ class APIMApiAlertsWidget extends Widget {
         this.assemblebackendalertreceived = this.assemblebackendalertreceived.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
         this.loadLocale = this.loadLocale.bind(this);
+        this.apiAlertsHandleChange = this.apiAlertsHandleChange.bind(this);
     }
 
 
@@ -266,79 +271,89 @@ class APIMApiAlertsWidget extends Widget {
         }
        super.getWidgetChannelManager().unsubscribeWidget(id);
        this.analyzealertdata();
+       //const{ backendalert, responsealert, reqalert } = this.state
+       //this.aluthinArrayhadamu(backendalert,responsealert,reqalert)
     }
 
 
-    //analyze the total alert data receivs
+
+
+    
+
+    //analyze the total alert data received
     analyzealertdata()
     {
+        
         const{ backendalert, responsealert, reqalert } = this.state
         console.log(backendalert, responsealert, reqalert);
         let sortedarray = [];
+        let totalcount = null;
 
         if (backendalert != null) {
-            backendalert.forEach(dataunit => {
-                sortedarray.push({
-                    ApiName: dataunit[0], alerts: dataunit[1]})
+            for (var i in backendalert) {
+                sortedarray.push(backendalert[i])
                 
-            });
+            } 
         }
-       
-
-        if (responsealert != null) {
-            if (sortedarray == null) {
-                responsealert.forEach(dataunit => {
-                    sortedarray.push({
-                        ApiName: dataunit[0], alerts: dataunit[1]})
-                    
-                });
-            }
-            else {
-                responsealert.forEach(resarrsy => {
-                       sortedarray.forEach(saray=> {
-                            if (saray.ApiName==resarrsy[0]) {
-                                saray.alerts += resarrsy[1]
-                            }else{
-                                sortedarray.push({
-                                    ApiName: resarrsy[0], alerts: resarrsy[1]})
-                            }
-                    
-                       });      
-                });
-            }
-            
-        }
-
-       
-
-        if (reqalert != null) {
-            if (sortedarray == null) {
-                reqalert.forEach(dataunit => {
-                    sortedarray.push({
-                        ApiName: dataunit[0], alerts: dataunit[1]})
-                    
-                });
-            }
-            else {
-                reqalert.forEach(resarrsy => {
-                    console.log(resarrsy[0]);
-                       sortedarray.forEach(saray=> {
-                           console.log(saray.ApiName);
-                            // if (saray.ApiName==resarrsy[0]) {
-                            //     saray.alerts += resarrsy[1]
-                            // }else{
-                            //     sortedarray.push({
-                            //         ApiName: resarrsy[0], alerts: resarrsy[1]})
-                            // }
-                    
-                       });      
-                });
-            }
-            
-        }
-
-        console.log(sortedarray);
         
+        if (responsealert != null) {
+            for(var i in responsealert){
+                var matchFoun =false
+                        for(var n in sortedarray){
+                            if(responsealert[i][0] == sortedarray[n][0]){
+                                sortedarray[n][1] += responsealert[i][1]
+                                matchFoun=true
+                            break
+                            }
+                        }
+                    if(matchFoun == false){
+                    sortedarray.push(responsealert[i])
+                    }
+            }
+        }
+        
+        if (reqalert != null) {
+            for(var i in reqalert){
+                var matchFoun =false
+                    for(var n in sortedarray){
+                        if(reqalert[i][0] == sortedarray[n][0]){
+                        sortedarray[n][1] += reqalert[i][1]
+                        matchFoun=true
+                        break
+                        }
+                    }
+                if(matchFoun == false){
+                sortedarray.push(reqalert[i])
+                }
+            } 
+        }
+        
+
+        sortedarray.forEach(element => {
+            totalcount += element[1];
+        });
+
+        console.log(sortedarray, totalcount);
+        this.setState({sortedarray, totalcount});
+        this.sortedarray = null;
+        this.converttojsonobject();
+    }
+
+    //convert the dataset to json object
+    converttojsonobject(){
+        const {sortedarray} = this.state;
+        var finaldataset = [];
+
+        finaldataset = sortedarray.map(function(x){
+            return{
+                "x": x[0]+ '  ' +'( '+ x[1]+' )',
+                "y": x[1]
+            }
+        })
+
+        this.setState({finaldataset})
+        console.log(finaldataset);
+
     }
 
 
@@ -353,18 +368,25 @@ class APIMApiAlertsWidget extends Widget {
         this.assemblealertQuery();
     }
 
+    apiAlertsHandleChange(event) {
+         const { id } = this.props;
+ 
+         this.setQueryParam(event.target.value);
+         super.getWidgetChannelManager().unsubscribeWidget(id);
+         this.assemblealertQuery();
+     }
+
     
     render() {
         const {
-            localeMessages, faultyProviderConf,
+            localeMessages, faultyProviderConf,finaldataset,totalcount
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
         } = this.styles;
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
-        const apialertProps = { themeName };
-       // console.log(sorteddata);
+        const apialertProps = { themeName, finaldataset, totalcount };
         
         if (!localeMessages) {
             return (

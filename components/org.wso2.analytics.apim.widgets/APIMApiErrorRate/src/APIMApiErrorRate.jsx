@@ -140,6 +140,7 @@ export default function APIMApiErrorRate(props) {
                 <h3
                 style={{
                     fontWeight: 'normal',
+                    paddingBottom: '30px'
                 }}
                 >
                    Total Error Rat: {errorpercentage} %
