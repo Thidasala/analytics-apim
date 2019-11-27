@@ -816,7 +816,13 @@
             </dependency>
 
             <!-- WSO2 APIM widgets-->
-             <dependency>
+            <dependency>
+                <groupId>org.wso2.analytics.apim</groupId>
+                <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.details</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.analytics.apim</groupId>
                 <artifactId>org.wso2.analytics.apim.widgets.apim.api.latency</artifactId>
                 <version>${project.version}</version>
