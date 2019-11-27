@@ -14,5 +14,6 @@
   "table.heading.apiname": "API NAME",
   "table.heading.version": "VERSION",
   "table.heading.hits": "HITS",
-  "widget.heading": "API Recent API Traffic"
+  "widget.heading": "API Monitoring",
+  "widget.subheading": " > Recent"
 }

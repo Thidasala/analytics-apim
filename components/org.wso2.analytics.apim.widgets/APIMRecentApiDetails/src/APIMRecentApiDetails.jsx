@@ -30,6 +30,7 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CustomTable from './CustomTable';
+import PrimarySearchAppBar from './PrimarySearchAppBar';
 
 /**
  * React Component for Recent Api Traffic widget body
@@ -44,7 +45,7 @@ export default function APIMRecentApiDetails(props) {
         headingWrapper: {
             height: '10%',
             margin: 'auto',
-            width: '90%',
+            width: '100%',
         },
         paperWrapper: {
             height: '75%',
@@ -78,56 +79,35 @@ export default function APIMRecentApiDetails(props) {
             marginTop: 10,
         },
     };
-    if (usageData.length === 0) {
-        return (
-            <div style={styles.paperWrapper}>
-                <Paper
-                    elevation={1}
-                    style={styles.paper}
-                >
-                    <Typography variant='h5' component='h3'>
-                        <FormattedMessage id='nodata.error.heading' defaultMessage='No Data Available !' />
-                    </Typography>
-                    <Typography component='p'>
-                        <FormattedMessage
-                            id='nodata.error.body'
-                            defaultMessage='No data available for the selected options.'
-                        />
-                    </Typography>
-                </Paper>
-            </div>
-        );
-    }
     return (
         <Scrollbars
             style={{ height }}
         >
-            <div style={{
-                padding: '5% 5%',
-            }}
-            >
-                <div style={styles.headingWrapper}>
+            <div>
+                {/* <div style={styles.headingWrapper}>
                     <h3 style={{
                         borderBottom: themeName === 'dark' ? '1px solid #fff' : '1px solid #02212f',
                         paddingBottom: '10px',
-                        margin: 'auto',
-                        marginTop: 0,
+                        marginLeft: '5px',
                         textAlign: 'left',
-                        fontWeight: 'normal',
-                        letterSpacing: 1.5,
+                        fontWeight: 'bold',
+                        letterSpacing: 1.2,
                     }}
                     >
-                        <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
-
+                        <FormattedMessage id='widget.heading' defaultMessage='Recent Api Details' />
+                        <FormattedMessage id='widget.subheading' defaultMessage='Recent' />
                     </h3>
-                </div>
+                    
+                </div> */}
+                <PrimarySearchAppBar/>
+
                 <div style={styles.formWrapper}>
                     <form style={styles.form}>
                        
                     </form>
                 </div>
                 <CustomTable
-                    data={usageData}
+                  data={usageData}
                 />
             </div>
         </Scrollbars>

@@ -52,7 +52,7 @@ const lightTheme = createMuiTheme({
 
 
 
-const queryParamKey = 'recentapidetails';
+const queryParamKey = 'recentapitraffic';
 
 
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
