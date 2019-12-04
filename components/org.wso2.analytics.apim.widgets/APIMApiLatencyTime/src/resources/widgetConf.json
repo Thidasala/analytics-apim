@@ -25,7 +25,7 @@
         "id": "header",
         "title": "Header",
         "type": {
-          "name": "BOOLEAN",
+          "name": "BOOlEAN",
           "possibleValues": [
             true,
             false

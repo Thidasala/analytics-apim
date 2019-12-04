@@ -29,15 +29,13 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import CustomTable from './CustomTable';
-import PrimarySearchAppBar from './PrimarySearchAppBar';
 
 /**
  * React Component for Recent Api Traffic widget body
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the Recent Api Traffic widget body
  */
-export default function APIMRecentApiDetails(props) {
+export default function APIMSingleApiStats(props) {
     const {
         themeName, height, usageData, handleChange, data
     } = props;
@@ -85,7 +83,7 @@ export default function APIMRecentApiDetails(props) {
             style={{ height }}
         >
             <div>
-                {/* <div style={styles.headingWrapper}>
+                <div style={styles.headingWrapper}>
                     <h3 style={{
                         borderBottom: themeName === 'dark' ? '1px solid #fff' : '1px solid #02212f',
                         paddingBottom: '10px',
@@ -99,7 +97,8 @@ export default function APIMRecentApiDetails(props) {
                         <FormattedMessage id='widget.subheading' defaultMessage='Recent' />
                     </h3>
                     
-                </div> */}
+                </div>
+                <h1>Hello</h1>
                 {/* <PrimarySearchAppBar/>
 
                 <div style={styles.formWrapper}>
@@ -107,15 +106,15 @@ export default function APIMRecentApiDetails(props) {
                        
                     </form>
                 </div> */}
-                <CustomTable
+                {/* <CustomTable
                   data={usageData}
-                />
+                /> */}
             </div>
         </Scrollbars>
     );
 }
 
-APIMRecentApiDetails.propTypes = {
+APIMSingleApiStats.propTypes = {
     themeName: PropTypes.string.isRequired,
     height: PropTypes.string.isRequired,
     usageData: PropTypes.instanceOf(Object).isRequired,

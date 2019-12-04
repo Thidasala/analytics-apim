@@ -1,6 +1,6 @@
 {
-  "name": "APIM Recent Api Details",
-  "id": "APIMRecentApiDetails",
+  "name": "APIM Single Api Stats",
+  "id": "APIMSingleApiStats",
   "thumbnailURL": "",
   "configs": {
     "pubsub": {

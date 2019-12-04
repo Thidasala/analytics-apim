@@ -30,7 +30,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Widget from '@wso2-dashboards/widget';
-import APIMRecentApiDetails from './APIMRecentApiDetails';
+import APIMSingleApiStats from './APIMSingleApiStats';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -61,7 +61,7 @@ const language = (navigator.languages && navigator.languages[0]) || navigator.la
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
 //Create react component for the APIM Recent Api Traffic
-class APIMRecentApiDetailsWidget extends Widget {
+class APIMSingleApiStatsWidget extends Widget {
    
     constructor(props) {
         super(props);
@@ -138,7 +138,7 @@ class APIMRecentApiDetailsWidget extends Widget {
 
  
     loadLocale(locale) {
-        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMRecentApiDetails/locales/${locale}.json`)
+        Axios.get(`${window.contextPath}/public/extensions/widgets/APIMSingleApiStats/locales/${locale}.json`)
             .then((response) => {
                 this.setState({ localeMessages: defineMessages(response.data) });
             })
@@ -209,7 +209,7 @@ class APIMRecentApiDetailsWidget extends Widget {
     /**
      * Handle Limit select Change
      * @param {Event} event - listened event
-     * @memberof APIMRecentApiDetailsWidget
+     * @memberof APIMSingleApiStatsWidget
      * */
     handleChange(event) {
         const { id } = this.props;
@@ -222,7 +222,7 @@ class APIMRecentApiDetailsWidget extends Widget {
     /**
      * Handle API Created By menu select change
      * @param {Event} event - listened event
-     * @memberof APIMRecentApiDetailsWidget
+     * @memberof APIMSingleApiStatsWidget
      * */
     apiCreatedHandleChange(event) {
        // const { limit } = this.state;
@@ -236,7 +236,7 @@ class APIMRecentApiDetailsWidget extends Widget {
     /**
      * @inheritDoc
      * @returns {ReactElement} Render the APIM Recent Api Traffic widget
-     * @memberof APIMRecentApiDetailsWidget
+     * @memberof APIMSingleApiStatsWidget
      */
     render() {
         const {
@@ -281,7 +281,7 @@ class APIMRecentApiDetailsWidget extends Widget {
                                 </Paper>
                             </div>
                         ) : (
-                            <APIMRecentApiDetails
+                            <APIMSingleApiStats
                                 {...apiUsageProps}
                                 apiCreatedHandleChange={this.apiCreatedHandleChange}
                                 handleChange={this.handleChange}
@@ -294,4 +294,4 @@ class APIMRecentApiDetailsWidget extends Widget {
     }
 }
 
-global.dashboard.registerWidget('APIMRecentApiDetails', APIMRecentApiDetailsWidget);
+global.dashboard.registerWidget('APIMSingleApiStats', APIMSingleApiStatsWidget);

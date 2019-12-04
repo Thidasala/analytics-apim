@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unused-state */
+/* eslint-disable require-jsdoc */
 /* eslint-disable indent */
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -24,6 +26,10 @@ import PropTypes from 'prop-types';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import MUIDataTable from 'mui-datatables';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import { FormattedMessage } from 'react-intl';
+import ApiInfo from './ApiInfo';
 
 
 const styles = theme => ({
@@ -80,22 +86,23 @@ const styles = theme => ({
   },
 });
 
-//define table columns
-const columns = ["Proxy", "Target", "Traffic", "Error 5XX", "Error 4XX", "Latency P99"];
 
-//define data
-const data = [
-  ["API1", "show", "15554", "54", "41", "545Ms"],
-  ["API2", "show", "1555", "54", "41", "54Ms"],
-  ["API3", "show", "154", "54", "41", "55Ms"],
-  ["API4", "show", "1554", "54", "41", "5Ms"],
- ];
+// define data
+// const datas = [[["API1", "show", "15554", "54", "41", "545M"],
+// ["API2", "show", "1555", "54", "41", "54Ms"],
+// ["API3", "show", "154", "54", "41", "55Ms"]],[["API1", "show", "15554", "54", "41", "545M"],
+// ["API2", "show", "1555", "54", "41", "54Ms"],
+// ["API3", "show", "154", "54", "41", "55Ms"]],[["API1", "show", "15554", "54", "41", "545M"],
+// ["API2", "show", "1555", "54", "41", "54Ms"],
+// ["API3", "show", "154", "54", "41", "55Ms"]]
+//  ];
 
 
 class CustomTable extends React.Component {
-
   constructor(props) {
     super(props);
+
+    const { data } = this.props;
 
       this.state = {
           tableData: [],
@@ -103,22 +110,77 @@ class CustomTable extends React.Component {
           order: 'desc',
           expanded: false,
           query: '',
+          datas: null,
+          datass: null,
+          finaldata: [],
       };
+    }
+
+    getData() {
+      console.log('This works');
+    }
+
+  renderdata(data) {
+  // console.log(data);
+    const finaldata = [];
+    data.forEach((element) => {
+    // console.log(element)
+      const avglatency = element[4] / element[2];
+      if (element[3] > 399 && element[3] < 499) {
+        finaldata.push([element[0], element[1], element[2], 0, element[3], parseInt(avglatency)]);
+      } else if (element[3] > 499) {
+        finaldata.push([element[0], element[1], element[2], element[3], 0, parseInt(avglatency)]);
+      } else {
+        finaldata.push([element[0], element[1], element[2], 0, 0, parseInt(avglatency)]);
+      }
+    });
+    // console.log(finaldata);
+   this.setState({ finaldata });
   }
 
   render() {
-    return(
-      <Paper>
-          <MUIDataTable
-            title={"Api Monitoring"}
-            data={data}
-            columns={columns}
-          />
-      </Paper>
+    const { data } = this.props;
+
+       // define table columns
+    const columns = ['Proxy', 'Target', 'Traffic', 'Error 5XX', 'Error 4XX', 'Latency P99'];
+
+        // define options for table
+    const options = {
+      filter: true,
+      filterType: 'checkbox',
+      expandableRows: false,
+      selectableRows: true,
+      expandableRowsOnClick: true,
+
+      onRowClick: (rowData, rowMeta) => {
+          console.log(rowData);
+          console.log(rowMeta);
+          this.render();
+      },
+    };
+
+    console.log(data);
+    const { finaldata } = this.state;
+
+
+   // console.log(finaldata);
+
+    return (
+        <Paper>
+            <MUIDataTable
+                title={'Api Monitoring -> Recent'}
+                data={data}
+                columns={columns}
+                options={options}
+            />
+        </Paper>
     );
   }
-
 }
 
+CustomTable.propTypes = {
+    // eslint-disable-next-line react/no-unused-prop-types
+    usageData: PropTypes.instanceOf(Object).isRequired,
+};
 
 export default withStyles(styles)(CustomTable);

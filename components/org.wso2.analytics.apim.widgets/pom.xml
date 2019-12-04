@@ -69,6 +69,7 @@
         <module>APIMApiErrorRate</module>
         <module>APIMApiAlerts</module>
         <module>APIMApiLatency</module>
+        <module>APIMSingleApiStats</module>
     </modules>
 
 </project>

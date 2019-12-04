@@ -21,32 +21,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Scrollbars } from 'react-custom-scrollbars';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CustomTable from './CustomTable';
-import PrimarySearchAppBar from './PrimarySearchAppBar';
 
 /**
  * React Component for Recent Api Traffic widget body
  * @param {any} props @inheritDoc
  * @returns {ReactElement} Render the Recent Api Traffic widget body
  */
-export default function APIMRecentApiDetails(props) {
-    const {
-        themeName, height, usageData, handleChange, data
-    } = props;
-    console.log(usageData);
+export default function ApiInfo(props) {
+    // const {
+    //     themeName, height, usageData,
+    // } = props;
     const styles = {
         headingWrapper: {
             height: '10%',
             margin: 'auto',
-            width: '100%',
+            width: '90%',
         },
         paperWrapper: {
             height: '75%',
@@ -80,42 +72,44 @@ export default function APIMRecentApiDetails(props) {
             marginTop: 10,
         },
     };
+
     return (
         <Scrollbars
             style={{ height }}
         >
-            <div>
-                {/* <div style={styles.headingWrapper}>
+            <div style={{
+                padding: '5% 5%',
+            }}
+            >
+                <div style={styles.headingWrapper}>
                     <h3 style={{
                         borderBottom: themeName === 'dark' ? '1px solid #fff' : '1px solid #02212f',
                         paddingBottom: '10px',
-                        marginLeft: '5px',
+                        margin: 'auto',
+                        marginTop: 0,
                         textAlign: 'left',
-                        fontWeight: 'bold',
-                        letterSpacing: 1.2,
+                        fontWeight: 'normal',
+                        letterSpacing: 1.5,
                     }}
                     >
-                        <FormattedMessage id='widget.heading' defaultMessage='Recent Api Details' />
-                        <FormattedMessage id='widget.subheading' defaultMessage='Recent' />
-                    </h3>
-                    
-                </div> */}
-                {/* <PrimarySearchAppBar/>
+                        <FormattedMessage id='widget.heading' defaultMessage='Recent Api Traffic' />
 
+                    </h3>
+                </div>
                 <div style={styles.formWrapper}>
                     <form style={styles.form}>
-                       
+                       hello
                     </form>
-                </div> */}
-                <CustomTable
-                  data={usageData}
-                />
+                </div>
+                {/* <CustomTable
+                    data={usageData}
+                /> */}
             </div>
         </Scrollbars>
     );
 }
 
-APIMRecentApiDetails.propTypes = {
+ApiInfo.propTypes = {
     themeName: PropTypes.string.isRequired,
     height: PropTypes.string.isRequired,
     usageData: PropTypes.instanceOf(Object).isRequired,
