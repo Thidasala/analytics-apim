@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 
 /*
  *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -50,7 +51,7 @@ const lightTheme = createMuiTheme({
     },
 });
 
-const queryParamKey = 'apimapialerts'
+const queryParamKey = 'apimapialerts';
 
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
 
@@ -58,7 +59,6 @@ const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
 
 class APIMApiAlertsWidget extends Widget {
-
     constructor(props) {
         super(props);
 
@@ -93,7 +93,7 @@ class APIMApiAlertsWidget extends Widget {
             reqalert: null,
             sortedarray: null,
             finaldataset: null,
-            totalcount : null
+            totalcount: null,
 
         };
 
@@ -117,7 +117,6 @@ class APIMApiAlertsWidget extends Widget {
     }
 
 
-
     componentDidMount() {
         const { widgetID, id } = this.props;
         const locale = languageWithoutRegionCode || language;
@@ -136,15 +135,15 @@ class APIMApiAlertsWidget extends Widget {
                 });
             });
     }
-   
 
 
-    //Set the date time range
+
+    // Set the date time range
     handlePublisherParameters(receivedMsg) {
         this.setState({
             timeFrom: receivedMsg.from,
             timeTo: receivedMsg.to,
-        },  this.assemblereqalertquery);
+        }, this.assemblereqalertquery);
     }
 
 
@@ -153,8 +152,8 @@ class APIMApiAlertsWidget extends Widget {
         super.getWidgetChannelManager().unsubscribeWidget(id);
     }
 
-    
-    //load the local file
+
+    // load the local file
     loadLocale(locale) {
         Axios.get(`${window.contextPath}/public/extensions/widgets/APIMApiAlerts/locales/${locale}.json`)
             .then((response) => {
@@ -162,9 +161,9 @@ class APIMApiAlertsWidget extends Widget {
             })
             .catch(error => console.error(error));
     }
- 
 
-    //format the siddhi query for abnormal request alert
+
+    // format the siddhi query for abnormal request alert
     assemblereqalertquery() {
         const queryParam = super.getGlobalState(queryParamKey);
         const { timeFrom, timeTo, providerConfig } = this.state;
@@ -180,17 +179,16 @@ class APIMApiAlertsWidget extends Widget {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
         };
-        
+
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.assemblereqalertreceived, dataProviderConfigs);
     }
 
 
-
     // format the abnormal request alert received
     assemblereqalertreceived(message) {
         const { data } = message;
-        //console.log(data);
+        // console.log(data);
         const { id } = this.props;
 
         if (data.length !== 0) {
@@ -201,8 +199,7 @@ class APIMApiAlertsWidget extends Widget {
     }
 
 
-
-    //format siddhi query for abnormal response alerts
+    // format siddhi query for abnormal response alerts
     assembleresponsealertquery() {
         const queryParam = super.getGlobalState(queryParamKey);
         const { timeFrom, timeTo, providerConfig } = this.state;
@@ -218,27 +215,27 @@ class APIMApiAlertsWidget extends Widget {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
         };
-        
+
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.assembleresponsealertreceived, dataProviderConfigs);
     }
 
-    //format the abnormal response time alert
+    // format the abnormal response time alert
     assembleresponsealertreceived(message) {
         const { data } = message;
-        //console.log(data);
+        // console.log(data);
         const { id } = this.props;
 
         if (data.length !== 0) {
-            this.setState({ responsealert:  data });
-            //console.log(data);
+            this.setState({ responsealert: data });
+            // console.log(data);
         }
         super.getWidgetChannelManager().unsubscribeWidget(id);
         this.assemblebackendalertquery();
     }
 
-     //format siddhi query for abnormal backend time alerts
-     assemblebackendalertquery() {
+    // format siddhi query for abnormal backend time alerts
+    assemblebackendalertquery() {
         const queryParam = super.getGlobalState(queryParamKey);
         const { timeFrom, timeTo, providerConfig } = this.state;
         const { id, widgetID: widgetName } = this.props;
@@ -253,111 +250,101 @@ class APIMApiAlertsWidget extends Widget {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
         };
-        
+
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.assemblebackendalertreceived, dataProviderConfigs);
     }
 
 
-    //format abnormal backend time alerts
+    // format abnormal backend time alerts
     assemblebackendalertreceived(message) {
         const { data } = message;
-        //console.log(data);
+        // console.log(data);
         const { id } = this.props;
 
         if (data.length !== 0) {
-            this.setState({ backendalert:  data });
-           // console.log(data);
+            this.setState({ backendalert: data });
+            // console.log(data);
         }
-       super.getWidgetChannelManager().unsubscribeWidget(id);
-       this.analyzealertdata();
-       //const{ backendalert, responsealert, reqalert } = this.state
-       //this.aluthinArrayhadamu(backendalert,responsealert,reqalert)
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.analyzealertdata();
+        // const{ backendalert, responsealert, reqalert } = this.state
+        // this.aluthinArrayhadamu(backendalert,responsealert,reqalert)
     }
 
 
-
-
-    
-
-    //analyze the total alert data received
-    analyzealertdata()
-    {
-        
-        const{ backendalert, responsealert, reqalert } = this.state
+    // analyze the total alert data received
+    // eslint-disable-next-line require-jsdoc
+    analyzealertdata() {
+        const { backendalert, responsealert, reqalert } = this.state;
         console.log(backendalert, responsealert, reqalert);
-        let sortedarray = [];
+        const sortedarray = [];
         let totalcount = null;
 
         if (backendalert != null) {
             for (var i in backendalert) {
-                sortedarray.push(backendalert[i])
-                
-            } 
-        }
-        
-        if (responsealert != null) {
-            for(var i in responsealert){
-                var matchFoun =false
-                        for(var n in sortedarray){
-                            if(responsealert[i][0] == sortedarray[n][0]){
-                                sortedarray[n][1] += responsealert[i][1]
-                                matchFoun=true
-                            break
-                            }
-                        }
-                    if(matchFoun == false){
-                    sortedarray.push(responsealert[i])
-                    }
+                sortedarray.push(backendalert[i]);
             }
         }
-        
-        if (reqalert != null) {
-            for(var i in reqalert){
-                var matchFoun =false
-                    for(var n in sortedarray){
-                        if(reqalert[i][0] == sortedarray[n][0]){
-                        sortedarray[n][1] += reqalert[i][1]
-                        matchFoun=true
-                        break
-                        }
-                    }
-                if(matchFoun == false){
-                sortedarray.push(reqalert[i])
-                }
-            } 
-        }
-        
 
-        sortedarray.forEach(element => {
+        if (responsealert != null) {
+            for (var i in responsealert) {
+                var matchFoun = false;
+                for (var n in sortedarray) {
+                    if (responsealert[i][0] == sortedarray[n][0]) {
+                        sortedarray[n][1] += responsealert[i][1];
+                        matchFoun = true;
+                        break;
+                    }
+                }
+                if (matchFoun == false) {
+                    sortedarray.push(responsealert[i]);
+                }
+            }
+        }
+
+        if (reqalert != null) {
+            for (var i in reqalert) {
+                var matchFoun = false;
+                for (var n in sortedarray) {
+                    if (reqalert[i][0] == sortedarray[n][0]) {
+                        sortedarray[n][1] += reqalert[i][1];
+                        matchFoun = true;
+                        break;
+                    }
+                }
+                if (matchFoun == false) {
+                    sortedarray.push(reqalert[i]);
+                }
+            }
+        }
+
+
+        sortedarray.forEach((element) => {
             totalcount += element[1];
         });
 
         console.log(sortedarray, totalcount);
-        this.setState({sortedarray, totalcount});
+        this.setState({ sortedarray, totalcount });
         this.sortedarray = null;
         this.converttojsonobject();
     }
 
-    //convert the dataset to json object
-    converttojsonobject(){
-        const {sortedarray} = this.state;
-        var finaldataset = [];
+    // convert the dataset to json object
+    converttojsonobject() {
+        const { sortedarray } = this.state;
+        let finaldataset = [];
 
-        finaldataset = sortedarray.map(function(x){
+        finaldataset = sortedarray.map((x) => {
             return{
-                "x": x[0]+ '  ' +'( '+ x[1]+' )',
+                "x": x[0] + '  ' + '( ' + x[1] + ' )',
                 "y": x[1]
-            }
-        })
+            };
+        });
 
-        this.setState({finaldataset})
+        this.setState({ finaldataset });
         console.log(finaldataset);
-
     }
-
-
-
 
 
     handleChange(event) {
@@ -369,17 +356,17 @@ class APIMApiAlertsWidget extends Widget {
     }
 
     apiAlertsHandleChange(event) {
-         const { id } = this.props;
- 
-         this.setQueryParam(event.target.value);
-         super.getWidgetChannelManager().unsubscribeWidget(id);
-         this.assemblealertQuery();
-     }
+        const { id } = this.props;
 
-    
+        this.setQueryParam(event.target.value);
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assemblealertQuery();
+    }
+
+
     render() {
         const {
-            localeMessages, faultyProviderConf,finaldataset,totalcount
+            localeMessages, faultyProviderConf, finaldataset, totalcount,
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
@@ -387,7 +374,7 @@ class APIMApiAlertsWidget extends Widget {
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
         const apialertProps = { themeName, finaldataset, totalcount };
-        
+
         if (!localeMessages) {
             return (
                 <div style={inProgress}>

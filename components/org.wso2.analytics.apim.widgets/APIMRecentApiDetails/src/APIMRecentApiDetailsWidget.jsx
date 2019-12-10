@@ -51,18 +51,12 @@ const lightTheme = createMuiTheme({
 });
 
 
-
-const queryParamKey = 'recentapitraffic';
-
-
 const language = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage;
-
 
 const languageWithoutRegionCode = language.toLowerCase().split(/[_-]+/)[0];
 
-//Create react component for the APIM Recent Api Traffic
+// Create react component for the APIM Recent Api Traffic
 class APIMRecentApiDetailsWidget extends Widget {
-   
     constructor(props) {
         super(props);
         this.styles = {
@@ -87,13 +81,14 @@ class APIMRecentApiDetailsWidget extends Widget {
             },
         };
 
-        
+
         this.state = {
             width: this.props.width,
             height: this.props.height,
             usageData: null,
+            totalcount: null,
             localeMessages: null,
-            data:null,
+            data: null,
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -106,6 +101,8 @@ class APIMRecentApiDetailsWidget extends Widget {
 
         this.handleChange = this.handleChange.bind(this);
         this.apiCreatedHandleChange = this.apiCreatedHandleChange.bind(this);
+        this.assembletotalQuery = this.assembletotalQuery.bind(this);
+        this.handletotalcountReceived = this.handletotalcountReceived.bind(this);
         this.assembleApiUsageQuery = this.assembleApiUsageQuery.bind(this);
         this.handleApiUsageReceived = this.handleApiUsageReceived.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
@@ -136,7 +133,7 @@ class APIMRecentApiDetailsWidget extends Widget {
         super.getWidgetChannelManager().unsubscribeWidget(this.props.id);
     }
 
- 
+
     loadLocale(locale) {
         Axios.get(`${window.contextPath}/public/extensions/widgets/APIMRecentApiDetails/locales/${locale}.json`)
             .then((response) => {
@@ -145,19 +142,18 @@ class APIMRecentApiDetailsWidget extends Widget {
             .catch(error => console.error(error));
     }
 
-    //Set the date time range
+    // Set the date time range
     handlePublisherParameters(receivedMsg) {
         this.setState({
             timeFrom: receivedMsg.from,
             timeTo: receivedMsg.to,
             perValue: receivedMsg.granularity,
-        }, this.assembleApiUsageQuery);
+        }, this.assembletotalQuery);
     }
 
-  
-    //Format the siddhi query
+
+    // Format the siddhi query
     assembleApiUsageQuery() {
-        const queryParam = super.getGlobalState(queryParamKey);
         const {
             timeFrom, timeTo, perValue, providerConfig,
         } = this.state;
@@ -168,41 +164,73 @@ class APIMRecentApiDetailsWidget extends Widget {
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-            '{{per}}': perValue
+            '{{per}}': perValue,
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleApiUsageReceived, dataProviderConfigs);
     }
 
-   
-    //format the query data
+
+    // format the query data
     handleApiUsageReceived(message) {
         const { data } = message;
-
-       console.log(data);
-
+        const { id } = this.props;
         if (data) {
             const usageData = [];
-            const counter = 0;
-
-            data.forEach(element => {
-                //console.log(element)
-                  let avglatency = element[4]/element[2];
-                  if (element[3] > 399 && element[3] < 499) {
-                    usageData.push([element[0], element [1], element [2], 0 , element[2], parseInt(avglatency)])
-                  }
-                  else if (element[3] > 499) {
-                    usageData.push([element[0], element [1], element [2], element[2], 0, parseInt(avglatency) ])
-                  }
-            
-                  else{
-                    usageData.push([element[0], element [1], element [2], 0, 0, parseInt(avglatency) ])
-                  }
-                });
-
+            data.forEach((element) => {
+                const avglatency = element[4] / element[2];
+                if (element[3] > 399 && element[3] < 499) {
+                    usageData.push([element[0], element[1], element[2], 0, element[2], parseInt(avglatency)]);
+                } else if (element[3] > 499) {
+                    usageData.push([element[0], element[1], element[2], element[2], 0, parseInt(avglatency)]);
+                } else {
+                    usageData.push([element[0], element[1], element[2], 0, 0, parseInt(avglatency)]);
+                }
+            });
+            this.setState({ usageData });
             console.log(usageData);
-            this.setState({ usageData, data });
+
+            super.getWidgetChannelManager().unsubscribeWidget(id);
+            // this.assembletotalQuery();
         }
+    }
+
+
+    // Query to calculate the main api count
+    assembletotalQuery() {
+        const {
+            timeFrom, timeTo, perValue, providerConfig,
+        } = this.state;
+        const { id, widgetID: widgetName } = this.props;
+
+        const dataProviderConfigs = cloneDeep(providerConfig);
+        dataProviderConfigs.configs.config.queryData.queryName = 'totalapiquery';
+        dataProviderConfigs.configs.config.queryData.queryValues = {
+            '{{from}}': timeFrom,
+            '{{to}}': timeTo,
+            '{{per}}': perValue,
+        };
+        super.getWidgetChannelManager()
+            .subscribeWidget(id, widgetName, this.handletotalcountReceived, dataProviderConfigs);
+    }
+
+    // handle the total count received
+    handletotalcountReceived(message) {
+        const totalcount = [];
+        const { data } = message;
+        // console.log(data);
+        const { id } = this.props;
+        data.forEach((element) => {
+            totalcount.push([element[0], '-', element[1], '-', '-', '-']);
+        });
+
+        // console.log(totalcount);
+
+
+        this.setState({ totalcount });
+
+        super.getWidgetChannelManager().unsubscribeWidget(id);
+        this.assembleApiUsageQuery();
     }
 
 
@@ -225,7 +253,7 @@ class APIMRecentApiDetailsWidget extends Widget {
      * @memberof APIMRecentApiDetailsWidget
      * */
     apiCreatedHandleChange(event) {
-       // const { limit } = this.state;
+        // const { limit } = this.state;
         const { id } = this.props;
 
         this.setQueryParam(event.target.value);
@@ -240,7 +268,7 @@ class APIMRecentApiDetailsWidget extends Widget {
      */
     render() {
         const {
-            localeMessages, faultyProviderConfig, height, usageData, data
+            localeMessages, faultyProviderConfig, height, usageData, data, totalcount,
         } = this.state;
         const {
             loadingIcon, paper, paperWrapper, inProgress,
@@ -248,7 +276,7 @@ class APIMRecentApiDetailsWidget extends Widget {
         const { muiTheme } = this.props;
         const themeName = muiTheme.name;
         const apiUsageProps = {
-            themeName, height, usageData, data
+            themeName, height, usageData, data, totalcount,
         };
 
         if (!localeMessages || !usageData) {

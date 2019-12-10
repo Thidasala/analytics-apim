@@ -19,16 +19,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
 import { Scrollbars } from 'react-custom-scrollbars';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import CustomTable from './CustomTable';
 import PrimarySearchAppBar from './PrimarySearchAppBar';
 
@@ -38,48 +29,7 @@ import PrimarySearchAppBar from './PrimarySearchAppBar';
  * @returns {ReactElement} Render the Recent Api Traffic widget body
  */
 export default function APIMRecentApiDetails(props) {
-    const {
-        themeName, height, usageData, handleChange, data
-    } = props;
-    console.log(usageData);
-    const styles = {
-        headingWrapper: {
-            height: '10%',
-            margin: 'auto',
-            width: '100%',
-        },
-        paperWrapper: {
-            height: '75%',
-        },
-        paper: {
-            background: '#969696',
-            width: '75%',
-            padding: '4%',
-            border: '1.5px solid #fff',
-            margin: 'auto',
-            marginTop: '5%',
-        },
-        formWrapper: {
-            width: '90%',
-            height: '10%',
-            margin: 'auto',
-        },
-        form: {
-            display: 'flex',
-            flexWrap: 'wrap',
-        },
-        formControl: {
-            margin: '5%',
-            minWidth: 120,
-        },
-        textField: {
-            margin: '5%',
-            minWidth: 120,
-        },
-        selectEmpty: {
-            marginTop: 10,
-        },
-    };
+    const { height, usageData, totalcount } = props;
     return (
         <Scrollbars
             style={{ height }}
@@ -98,17 +48,12 @@ export default function APIMRecentApiDetails(props) {
                         <FormattedMessage id='widget.heading' defaultMessage='Recent Api Details' />
                         <FormattedMessage id='widget.subheading' defaultMessage='Recent' />
                     </h3>
-                    
-                </div> */}
-                {/* <PrimarySearchAppBar/>
 
-                <div style={styles.formWrapper}>
-                    <form style={styles.form}>
-                       
-                    </form>
                 </div> */}
+                <PrimarySearchAppBar />
                 <CustomTable
-                  data={usageData}
+                    usageData={usageData}
+                    totalcount={totalcount}
                 />
             </div>
         </Scrollbars>
@@ -116,9 +61,7 @@ export default function APIMRecentApiDetails(props) {
 }
 
 APIMRecentApiDetails.propTypes = {
-    themeName: PropTypes.string.isRequired,
     height: PropTypes.string.isRequired,
     usageData: PropTypes.instanceOf(Object).isRequired,
-    apiCreatedHandleChange: PropTypes.func.isRequired,
-    handleChange: PropTypes.func.isRequired,
+    totalcount: PropTypes.instanceOf(Object).isRequired,
 };

@@ -818,6 +818,12 @@
             <!-- WSO2 APIM widgets-->
             <dependency>
                 <groupId>org.wso2.analytics.apim</groupId>
+                <artifactId>org.wso2.analytics.apim.widgets.apim.single.api.stats</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.analytics.apim</groupId>
                 <artifactId>org.wso2.analytics.apim.widgets.apim.recent.api.details</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>

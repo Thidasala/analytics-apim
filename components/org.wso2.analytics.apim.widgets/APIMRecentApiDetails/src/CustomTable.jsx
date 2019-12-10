@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable no-console */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable require-jsdoc */
 /* eslint-disable indent */
@@ -28,8 +30,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MUIDataTable from 'mui-datatables';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import { FormattedMessage } from 'react-intl';
-import ApiInfo from './ApiInfo';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 
 
 const styles = theme => ({
@@ -86,24 +87,9 @@ const styles = theme => ({
   },
 });
 
-
-// define data
-// const datas = [[["API1", "show", "15554", "54", "41", "545M"],
-// ["API2", "show", "1555", "54", "41", "54Ms"],
-// ["API3", "show", "154", "54", "41", "55Ms"]],[["API1", "show", "15554", "54", "41", "545M"],
-// ["API2", "show", "1555", "54", "41", "54Ms"],
-// ["API3", "show", "154", "54", "41", "55Ms"]],[["API1", "show", "15554", "54", "41", "545M"],
-// ["API2", "show", "1555", "54", "41", "54Ms"],
-// ["API3", "show", "154", "54", "41", "55Ms"]]
-//  ];
-
-
 class CustomTable extends React.Component {
   constructor(props) {
     super(props);
-
-    const { data } = this.props;
-
       this.state = {
           tableData: [],
           orderBy: 'hits',
@@ -113,66 +99,128 @@ class CustomTable extends React.Component {
           datas: null,
           datass: null,
           finaldata: [],
+          finalrowdata: [],
       };
     }
 
-    getData() {
-      console.log('This works');
+    getData(rowData, rowMeta) {
+      console.log(rowData);
+      console.log(rowMeta);
     }
 
-  renderdata(data) {
-  // console.log(data);
-    const finaldata = [];
-    data.forEach((element) => {
-    // console.log(element)
-      const avglatency = element[4] / element[2];
-      if (element[3] > 399 && element[3] < 499) {
-        finaldata.push([element[0], element[1], element[2], 0, element[3], parseInt(avglatency)]);
-      } else if (element[3] > 499) {
-        finaldata.push([element[0], element[1], element[2], element[3], 0, parseInt(avglatency)]);
-      } else {
-        finaldata.push([element[0], element[1], element[2], 0, 0, parseInt(avglatency)]);
-      }
-    });
-    // console.log(finaldata);
-   this.setState({ finaldata });
-  }
+    renderexpandrowdata(rowData) {
+        const expandeddata = [];
+        const colSpan = rowData.length + 1;
+        const { usageData } = this.props;
+        usageData.forEach((element) => {
+          if (element[0] === rowData[0]) {
+            expandeddata.push(element);
+          }
+        });
+      console.log(expandeddata[0][0]);
+      return (
+          <TableRow>
+              <TableCell colSpan={colSpan}>
+                  {expandeddata[0][0]}
+              </TableCell>
+          </TableRow>
+      );
+    }
 
   render() {
-    const { data } = this.props;
+    const { usageData, totalcount, classes } = this.props;
 
-       // define table columns
-    const columns = ['Proxy', 'Target', 'Traffic', 'Error 5XX', 'Error 4XX', 'Latency P99'];
+    const theme = createMuiTheme({
+      palette: { type: 'dark' },
+      overrides: {
+        MUIDataTable: {
+          root: {
+            type: 'dark',
+          },
+        },
+        MUIDataTableHeadCell: {
+          data: {
+            fontSize: '15px',
+          },
+        },
+      },
+    });
 
-        // define options for table
+     // console.log(totalcount);
+
+
+    // define table columns
+    const columns = ['Proxy', 'Target', 'Total Hits', 'Error 5XX', 'Error 4XX', 'Average Latency P99'];
+
+    // define options for table
     const options = {
       filter: true,
-      filterType: 'checkbox',
-      expandableRows: false,
-      selectableRows: true,
-      expandableRowsOnClick: true,
+      filterType: 'dropdown',
+      expandableRows: true,
+      selectableRows: false,
+      // expandableRowsOnClick: true,
+      isRowExpandable: (dataIndex, expandedRows) => {
+        // Prevent expand/collapse of any row if there are 4 rows expanded already (but allow those already expanded to be collapsed)
+        if (expandedRows.data.length > 0 && expandedRows.data.filter(d => d.dataIndex === dataIndex).length === 0) return false;
+        return true;
+      },
+      renderExpandableRow: (rowData) => {
+        const expandeddata = [];
+        const colSpan = 1;
+        usageData.forEach((element) => {
+          if (element[0] === rowData[0]) {
+            expandeddata.push(element);
+          }
+        });
 
-      onRowClick: (rowData, rowMeta) => {
-          console.log(rowData);
-          console.log(rowMeta);
-          this.render();
+      console.log(expandeddata[0][0]);
+      return (
+          expandeddata.map(item => (
+              <TableRow>
+                  <TableCell colSpan={colSpan} />
+                  <TableCell>
+                      <button
+                          type='button'
+                          onClick={() => {
+                            // window.location.href = './api-app-stats';
+                            window.location.href = './api-single-api-stats#{"apsssss":{"hello"}}';
+                            }}
+                      >
+                        Click
+                      </button>
+                  </TableCell>
+                  <TableCell />
+                  <TableCell>
+                      {item[1]}
+                  </TableCell>
+                  <TableCell>
+                      {item[2]}
+                  </TableCell>
+                  <TableCell>
+                      {item[3]}
+                  </TableCell>
+                  <TableCell>
+                      {item[4]}
+                  </TableCell>
+                  <TableCell>
+                      {item[5]}
+                  </TableCell>
+              </TableRow>
+         ))
+      );
       },
     };
 
-    console.log(data);
-    const { finaldata } = this.state;
-
-
-   // console.log(finaldata);
-
     return (
-        <Paper>
-            <MUIDataTable
-                title={'Api Monitoring -> Recent'}
-                data={data}
-                columns={columns}
-                options={options}
-            />
+        <Paper className={classes.root}>
+            <MuiThemeProvider theme={theme}>
+                <MUIDataTable
+                    // title={'Api Monitoring -> Recent'}
+                    data={totalcount}
+                    columns={columns}
+                    options={options}
+                />
+            </MuiThemeProvider>
         </Paper>
     );
   }
@@ -181,6 +229,8 @@ class CustomTable extends React.Component {
 CustomTable.propTypes = {
     // eslint-disable-next-line react/no-unused-prop-types
     usageData: PropTypes.instanceOf(Object).isRequired,
+    totalcount: PropTypes.instanceOf(Object).isRequired,
+    classes: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default withStyles(styles)(CustomTable);

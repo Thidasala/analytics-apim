@@ -21,6 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Scrollbars } from 'react-custom-scrollbars';
+import AppBar from './AppBar';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -29,6 +30,12 @@ import Input from '@material-ui/core/Input';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import DetailBar from './DetailBar';
+import Trafficchart from './Trafficchart';
+import LatencyChart from './LatencyChart';
+import ErrorDetailChart from './ErrorDetailChart';
+import ErrorAnalysisChart from './ErrorAnalysisChart';
+
 
 /**
  * React Component for Recent Api Traffic widget body
@@ -39,7 +46,7 @@ export default function APIMSingleApiStats(props) {
     const {
         themeName, height, usageData, handleChange, data
     } = props;
-    console.log(usageData);
+   // console.log(usageData);
     const styles = {
         headingWrapper: {
             height: '10%',
@@ -79,11 +86,28 @@ export default function APIMSingleApiStats(props) {
         },
     };
     return (
-        <Scrollbars
-            style={{ height }}
-        >
+        // <Scrollbars
+        //     style={{ height }}
+        // >
             <div>
-                <div style={styles.headingWrapper}>
+                <AppBar/>
+                <DetailBar/>
+                <div style={{width: '50%', float: 'left'}}>
+                <Trafficchart/>
+                </div>
+                <div style={{width: '50%', float: 'left'}}>
+                <LatencyChart/>
+                </div>
+                <div style={{width: '50%', float: 'left'}}>
+                <ErrorDetailChart/>
+                </div>
+                <div style={{width: '50%', float: 'left'}}>
+                <ErrorAnalysisChart/>
+                </div>
+                
+                
+                
+                {/* <div style={styles.headingWrapper}>
                     <h3 style={{
                         borderBottom: themeName === 'dark' ? '1px solid #fff' : '1px solid #02212f',
                         paddingBottom: '10px',
@@ -97,20 +121,20 @@ export default function APIMSingleApiStats(props) {
                         <FormattedMessage id='widget.subheading' defaultMessage='Recent' />
                     </h3>
                     
-                </div>
-                <h1>Hello</h1>
-                {/* <PrimarySearchAppBar/>
-
-                <div style={styles.formWrapper}>
-                    <form style={styles.form}>
-                       
-                    </form>
                 </div> */}
+                {/* <PrimarySearchAppBar/>*/}
+
+                {/* <div style={styles.formWrapper}>
+                    <form style={styles.form}>
+                    <AppBar/>
+                <DetailBar/>
+                    </form>
+                </div>  */}
                 {/* <CustomTable
                   data={usageData}
                 /> */}
             </div>
-        </Scrollbars>
+        // </Scrollbars>
     );
 }
 

@@ -94,6 +94,8 @@ class APIMSingleApiStatsWidget extends Widget {
             usageData: null,
             localeMessages: null,
             data:null,
+            apiname: 'PizzaShackAPI',
+            totalreqcount: 0,
         };
 
         // This will re-size the widget when the glContainer's width is changed.
@@ -105,7 +107,7 @@ class APIMSingleApiStatsWidget extends Widget {
         }
 
         this.handleChange = this.handleChange.bind(this);
-        this.apiCreatedHandleChange = this.apiCreatedHandleChange.bind(this);
+        //this.apiCreatedHandleChange = this.apiCreatedHandleChange.bind(this);
         this.assembleApiUsageQuery = this.assembleApiUsageQuery.bind(this);
         this.handleApiUsageReceived = this.handleApiUsageReceived.bind(this);
         this.handlePublisherParameters = this.handlePublisherParameters.bind(this);
@@ -159,16 +161,22 @@ class APIMSingleApiStatsWidget extends Widget {
     assembleApiUsageQuery() {
         const queryParam = super.getGlobalState(queryParamKey);
         const {
-            timeFrom, timeTo, perValue, providerConfig,
+            timeFrom, timeTo, perValue, providerConfig,apiname
         } = this.state;
+
+        console.log(timeFrom, timeTo, perValue);
+        
         const { id, widgetID: widgetName } = this.props;
 
         const dataProviderConfigs = cloneDeep(providerConfig);
-        dataProviderConfigs.configs.config.queryData.queryName = 'apiusagequery';
+
+        dataProviderConfigs.configs.config.apiname = apiname;
+        dataProviderConfigs.configs.config.queryData.queryName = 'totalquery';
         dataProviderConfigs.configs.config.queryData.queryValues = {
             '{{from}}': timeFrom,
             '{{to}}': timeTo,
-            '{{per}}': perValue
+            '{{per}}': perValue,
+            '{{apiname}}': apiname,
         };
         super.getWidgetChannelManager()
             .subscribeWidget(id, widgetName, this.handleApiUsageReceived, dataProviderConfigs);
@@ -179,7 +187,17 @@ class APIMSingleApiStatsWidget extends Widget {
     handleApiUsageReceived(message) {
         const { data } = message;
 
-       console.log(data);
+        let totalreqcount = 0;
+        data.forEach(element => {
+            totalreqcount += element[3];
+
+
+        });
+
+        this.setState({totalreqcount});
+       
+        console.log(data);
+        console.log(totalreqcount);
 
         if (data) {
             const usageData = [];
@@ -200,7 +218,7 @@ class APIMSingleApiStatsWidget extends Widget {
                   }
                 });
 
-            console.log(usageData);
+           // console.log(usageData);
             this.setState({ usageData, data });
         }
     }
@@ -212,20 +230,6 @@ class APIMSingleApiStatsWidget extends Widget {
      * @memberof APIMSingleApiStatsWidget
      * */
     handleChange(event) {
-        const { id } = this.props;
-
-        this.setQueryParam(event.target.value);
-        super.getWidgetChannelManager().unsubscribeWidget(id);
-        this.assembleApiUsageQuery();
-    }
-
-    /**
-     * Handle API Created By menu select change
-     * @param {Event} event - listened event
-     * @memberof APIMSingleApiStatsWidget
-     * */
-    apiCreatedHandleChange(event) {
-       // const { limit } = this.state;
         const { id } = this.props;
 
         this.setQueryParam(event.target.value);
@@ -283,8 +287,6 @@ class APIMSingleApiStatsWidget extends Widget {
                         ) : (
                             <APIMSingleApiStats
                                 {...apiUsageProps}
-                                apiCreatedHandleChange={this.apiCreatedHandleChange}
-                                handleChange={this.handleChange}
                             />
                         )
                     }
